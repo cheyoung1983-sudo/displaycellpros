@@ -18,7 +18,12 @@ npm run test           # tsx scripts/run-all-tests.ts — hand-written assertion
 npm run test:jest       # jest — runs the *.test.ts files under src/ (jsdom env)
 npm run test:shopify    # tsx scripts/test-shopify.ts — hits real/sandboxed Shopify API
 npm run test:all        # test + test:jest + test:shopify
+npm run preflight        # scripts/preflight.ts — run before pushing/opening a PR (see below)
 ```
+
+### Before pushing: `npm run preflight`
+
+Run this before pushing or opening a PR. It exists because CI has broken twice for reasons a normal `npm run build` locally wouldn't catch: an npm script referencing a binary (`tsx`, `eslint`, `@testing-library/*`) that was never actually added to `package.json`, and a branch going stale against `main` after someone else pushed directly to it. `scripts/preflight.ts` checks, in order: every npm script's binary actually resolves in `node_modules/.bin`, the lockfile is in sync (`npm ci --dry-run`), `npm outdated`/`npm audit` (informational only — see the known, intentionally-unpatched advisories below), whether the current branch is behind `origin/main`, then the same `tsc --noEmit` → `lint` → `test` → `test:jest` → `build` pipeline CI runs. Exits non-zero if any of the hard checks fail.
 
 There is no dev server for the legacy Vite/Express app (`server.ts`) wired into `package.json` — see "Legacy Vite/Express app" below if you need to touch it.
 

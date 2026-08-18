@@ -11,6 +11,7 @@
     "test:jest": "jest",
     "test:all": "tsx scripts/run-all-tests.ts && jest && tsx scripts/test-shopify.ts",
     "test:shopify": "tsx scripts/test-shopify.ts",
+    "preflight": "tsx scripts/preflight.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
