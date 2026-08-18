@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useToast } from './Toast.tsx';
 import { REPAIR_DB_INDEX_RECOMMENDATIONS, POSTGRES_TABLE_SCHEMAS_DDL } from '../lib/dbOptimizations.ts';
-import { useDatabase, downloadDatabaseBackup } from '../lib/db.ts';
+import { useDatabase, downloadDatabaseBackup } from '../lib/offlineDb.ts';
 
 interface PoolMetricsData {
   status: string;

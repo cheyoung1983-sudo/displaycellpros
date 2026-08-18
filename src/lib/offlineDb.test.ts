@@ -10,7 +10,7 @@ import {
   exportDatabaseRecordsAsJson,
   exportDatabaseRecordsAsCsv,
   downloadDatabaseBackup,
-} from './db.ts';
+} from './offlineDb.ts';
 import { Manufacturer, ServiceTier } from '../types.ts';
 
 describe('Local SQLite Database & Offline Intake Store', () => {
