@@ -1,11 +1,13 @@
+'use client';
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
- * 
- * Local & Cloud Database Management Layer:
- * 1. Local SQLite Storage Engine (better-sqlite3 / offline-first browser fallback)
- *    and React Hook (useDatabase / useOfflineDatabase) for persisting Repair Intake entries offline.
- * 2. High-Availability PostgreSQL Connection Pool with Read-Replica split and RDS IAM Signer.
+ *
+ * Local, offline-first SQLite storage engine (browser fallback) and the
+ * React hook (useDatabase / useOfflineDatabase) for persisting Repair
+ * Intake entries offline. For the server-side AWS Aurora PostgreSQL pool
+ * (query/queryReadOnly/isDbConfigured), see src/lib/serverDb.ts instead.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';

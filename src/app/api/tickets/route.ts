@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, isDbConfigured } from '@/lib/db';
+import { query, isDbConfigured } from '@/lib/serverDb';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
