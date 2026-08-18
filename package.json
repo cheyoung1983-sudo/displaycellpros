@@ -2,6 +2,9 @@
   "name": "www.displaycellpros.com",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "prisma generate && next build",
