@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import UserProviderWrapper from '@/components/UserProviderWrapper';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: 'Display & Cell Pros LLC | Spokane On-Site Mobile Repair',
@@ -42,6 +43,7 @@ export default function RootLayout({
             </div>
           </footer>
         </UserProviderWrapper>
+        <Analytics />
       </body>
     </html>
   );

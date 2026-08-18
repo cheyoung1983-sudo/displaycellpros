@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { IntakeFormData, Manufacturer, ServiceTier } from '../types.ts';
+import { IntakeFormData, Manufacturer, ServiceTier } from '../types';
 
 // ============================================================================
 // 1. OFFLINE SQLITE & LOCAL REPAIR INTAKE DATABASE INTERFACE

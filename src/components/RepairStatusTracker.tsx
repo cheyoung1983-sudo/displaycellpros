@@ -12,7 +12,6 @@ import {
   Cpu, 
   Activity, 
   Calendar,
-  User,
   ArrowRight,
   ExternalLink,
   FileText,
