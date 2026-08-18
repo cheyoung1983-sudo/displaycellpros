@@ -7,17 +7,17 @@ export async function POST(req: Request) {
   try {
     const { prompt, model } = await req.json();
 
-    const apiKey = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN || process.env.OPENAI_API_KEY;
+    const apiKey = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "AI Gateway API Key, VERCEL_OIDC_TOKEN, or OPENAI_API_KEY environment variable is required." },
+        { error: "AI Gateway API Key or VERCEL_OIDC_TOKEN environment variable is required." },
         { status: 401 }
       );
     }
 
     const result = await generateText({
-      model: model || 'xai/grok-4.5',
+      model: model || 'alibaba/qwen3-next-80b-a3b-instruct',
       prompt: prompt || 'Explain device repair and diagnostics best practices.',
     });
 
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-  const apiKey = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN || process.env.OPENAI_API_KEY;
+  const apiKey = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
 
   if (!apiKey) {
     return NextResponse.json({
@@ -40,7 +40,7 @@ export async function GET() {
 
   try {
     const result = await generateText({
-      model: 'xai/grok-4.5',
+      model: 'alibaba/qwen3-next-80b-a3b-instruct',
       prompt: 'Provide a 1-sentence welcome greeting for a smartphone repair shop.',
     });
     return NextResponse.json({ status: "active", greeting: result.text });

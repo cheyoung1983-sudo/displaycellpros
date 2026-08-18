@@ -18,6 +18,18 @@ export const SmartTriageSchema = z.object({
   symptomDescription: z.string().min(1, 'Symptom description is required').max(2500),
 });
 
+export const TriageResponseSchema = z.object({
+  text: z.string(),
+  detectedSpecs: z.object({
+    brand: z.string(),
+    model: z.string(),
+    tier: z.string(),
+    issue: z.string(),
+    pricingTier: z.string(),
+    step: z.number().int().min(1).max(3),
+  }),
+});
+
 export const DiagnosticPathSchema = z.object({
   deviceManufacturer: z.string().max(80).optional().default('Unknown'),
   deviceModel: z.string().max(120).optional().default('Device'),
