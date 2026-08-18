@@ -14,20 +14,23 @@ npm run build         # prisma generate && next build
 npm start             # next start -p 3000 (serve production build)
 npm run lint           # next lint
 npx tsc --noEmit        # strict typecheck (CI runs this separately from lint)
-npm run test           # tsx scripts/run-all-tests.ts — the ONLY test command wired up (see Testing below)
+npm run test           # tsx scripts/run-all-tests.ts — hand-written assertion script, requires the `tsx` devDependency
+npm run test:jest       # jest — runs the *.test.ts files under src/ (jsdom env)
 npm run test:shopify    # tsx scripts/test-shopify.ts — hits real/sandboxed Shopify API
-npm run test:all        # test + test:shopify
+npm run test:all        # test + test:jest + test:shopify
 ```
 
 There is no dev server for the legacy Vite/Express app (`server.ts`) wired into `package.json` — see "Legacy Vite/Express app" below if you need to touch it.
 
 ### Testing — read before adding tests
 
-`npm run test` runs `scripts/run-all-tests.ts`, a small hand-written assertion script (not a test framework) that only imports and exercises `completionCalculator.ts` and `supportedDevicesData.ts`. This is what CI (`.github/workflows/*.yml`) actually runs.
+Two test paths, both wired into CI (`.github/workflows/webpack.yml`, in this order: lint → `test` → `test:jest` → build):
+- `npm run test` runs `scripts/run-all-tests.ts`, a small hand-written assertion script (not a test framework) that only imports and exercises `completionCalculator.ts` and `supportedDevicesData.ts`.
+- `npm run test:jest` runs the `*.test.ts` files scattered under `src/` (e.g. `src/lib/pricing.test.ts`, `src/lib/schemas.test.ts`, `src/components/*.test.ts`) via `jest.config.ts` (Next's `next/jest` wrapper, jsdom environment, `jest.setup.ts` loads `@testing-library/jest-dom`). Import `describe`/`it`/`expect`/`jest` from `@jest/globals` (not `'vitest'` — an earlier version of these files was written against Vitest, which was never installed; that's why they silently never ran until this was fixed).
 
-Separately, the repo has `jest.config.ts`, `jest.setup.ts`, and several `*.test.ts` files scattered under `src/` (e.g. `src/lib/pricing.test.ts`, `src/lib/schemas.test.ts`, `src/components/*.test.ts`). **These are not run by any npm script and `jest`/`@testing-library/*` are not fully wired as dependencies** — treat them as not-currently-executable rather than as the live test suite. If you add logic that needs testing, either:
-- add assertions to `scripts/run-all-tests.ts` following its existing `assert(condition, name, detail)` pattern (this is what CI checks), or
-- if fixing the Jest setup, install the missing `@testing-library/*` packages and wire a `test:jest` (or similar) script into `package.json` and CI — don't assume `npx jest` works as-is.
+Both `tsx` and `eslint`/`eslint-config-next` were previously used by `package.json` scripts (`test`, `test:all`, `lint`) but were missing from `devDependencies` — `npm install` alone did not make `npm run test` or `npm run lint` work. All of the above are now real, installed devDependencies; if a fresh `npm ci` ever reports one of these commands as "not found" again, the fix is to add the missing package, not to assume the script is aspirational. Pin `eslint` to `^8` — `next lint` under Next 15 with the legacy `.eslintrc.json` format does not support ESLint 9/10's CLI options.
+
+If you add logic that needs testing, either add assertions to `scripts/run-all-tests.ts` following its existing `assert(condition, name, detail)` pattern, or add a Jest test file following the existing ones' style.
 
 ## Architecture
 

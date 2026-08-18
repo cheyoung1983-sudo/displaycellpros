@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from '@jest/globals';
 import { SUPPORTED_DEVICES_DATABASE } from '../data/supportedDevicesData.ts';
 
 describe('SupportedDevicesDatabase Autocomplete filtering', () => {

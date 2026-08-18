@@ -8,7 +8,8 @@
     "start": "next start -p 3000",
     "lint": "next lint",
     "test": "tsx scripts/run-all-tests.ts",
-    "test:all": "tsx scripts/run-all-tests.ts && tsx scripts/test-shopify.ts",
+    "test:jest": "jest",
+    "test:all": "tsx scripts/run-all-tests.ts && jest && tsx scripts/test-shopify.ts",
     "test:shopify": "tsx scripts/test-shopify.ts",
     "postinstall": "prisma generate"
   },
@@ -59,13 +60,20 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
     "@types/express": "^5.0.6",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.5.4",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.22",
+    "jest-environment-jsdom": "^30.4.1",
     "postcss": "^8.0.0",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.12",
     "typescript": "^5.0.0"
   }
 }

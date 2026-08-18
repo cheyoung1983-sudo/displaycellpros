@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from '@jest/globals';
 import { calculateQuote, PRICING_TIERS, TAX_RATES } from './pricing.ts';
 import { ServiceTier } from '../types.ts';
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { SPEED_PRESETS, FOUNDER_ANIMATION_STORAGE_KEY, DEFAULT_SPEED_PRESET, AnimationSpeedPreset } from './useFounderAnimationSpeed';
 
 describe('Founder Animation Speed Configurations & Storage', () => {
@@ -23,8 +23,8 @@ describe('Founder Animation Speed Configurations & Storage', () => {
     if (typeof globalThis.window === 'undefined') {
       (globalThis as unknown as { window: unknown }).window = {
         localStorage: storageMock,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
       };
     } else {
       Object.defineProperty(globalThis.window, 'localStorage', {

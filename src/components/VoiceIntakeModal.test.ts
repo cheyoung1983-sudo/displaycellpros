@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from '@jest/globals';
 import type { VoiceIntakeTicket } from './VoiceIntakeModal.tsx';
 
 describe('VoiceIntake Data Model', () => {
