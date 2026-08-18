@@ -47,7 +47,7 @@ import {
 } from 'lucide-react';
 import { useSafeAuth0 } from './Auth0ProviderWithConfig.tsx';
 import { useToast } from './Toast.tsx';
-import { useDatabase } from '../lib/db.ts';
+import { useDatabase } from '../lib/offline-db';
 import { calculateDynamicCompletionDate } from '../utils/completionCalculator.ts';
 
 export interface RepairOrderCost {

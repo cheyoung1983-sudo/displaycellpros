@@ -45,7 +45,7 @@ import {
 } from '../types.ts';
 import { cn } from '../lib/utils.ts';
 import { calculateQuote, PricingBreakdown } from '../lib/pricing.ts';
-import { downloadDatabaseBackup, saveOfflineRepairIntake } from '../lib/db.ts';
+import { downloadDatabaseBackup, saveOfflineRepairIntake } from '../lib/offline-db';
 import AIDiagnostic from './AIDiagnostic.tsx';
 import DeviceCameraCapture, { CapturedPhoto } from './DeviceCameraCapture.tsx';
 import TechnicianChecklist from './TechnicianChecklist.tsx';
