@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import UserProviderWrapper from '@/components/UserProviderWrapper';
 
@@ -14,10 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcB60UtAAAAAEk-ADlBMnuUjbWXddXTyXLcmoSj"></script>
-      </head>
       <body className="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+        <Script
+          src="https://www.google.com/recaptcha/enterprise.js?render=6LcB60UtAAAAAEk-ADlBMnuUjbWXddXTyXLcmoSj"
+          strategy="afterInteractive"
+        />
         <UserProviderWrapper>
           <header className="border-b border-slate-200 bg-white shadow-xs sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
