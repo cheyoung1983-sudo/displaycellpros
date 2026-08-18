@@ -15,6 +15,16 @@ export default function QRScannerModal({ isOpen, onClose, onScanSuccess }: QRSca
   const [scannedResult, setScannedResult] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
+  // Keep latest callback identities without re-running the scan effect below:
+  // that effect must only start/stop the camera when the modal opens/closes,
+  // not whenever the parent re-renders with a fresh onClose/onScanSuccess.
+  const onCloseRef = useRef(onClose);
+  const onScanSuccessRef = useRef(onScanSuccess);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    onScanSuccessRef.current = onScanSuccess;
+  }, [onClose, onScanSuccess]);
+
   useEffect(() => {
     if (!isOpen) {
       stopScanner();
@@ -63,8 +73,8 @@ export default function QRScannerModal({ isOpen, onClose, onScanSuccess }: QRSca
 
             setTimeout(() => {
               stopScanner();
-              onScanSuccess(ticketId);
-              onClose();
+              onScanSuccessRef.current(ticketId);
+              onCloseRef.current();
             }, 800);
           },
           (_errorMessage) => {
