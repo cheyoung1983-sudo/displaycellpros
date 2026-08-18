@@ -1,4 +1,3 @@
-import { auth0 } from "./lib/auth0";
 import { get } from "@vercel/edge-config";
 import { NextResponse } from 'next/server';
 import { validateLexicalPayload } from '@/lib/lexical-firewall';
@@ -41,8 +40,9 @@ export async function proxy(request: Request) {
   }
 
   try {
-    // Auth0 middleware is handled via handleAuth() routes in Next.js 13+ App Router
-    // for standard authentication flows. 
+    // Auth0 v4 routes (/auth/login, /auth/logout, /auth/callback, /auth/profile,
+    // /auth/access-token) are handled by auth0.middleware() in src/middleware.ts
+    // before this function ever runs.
     return NextResponse.next();
   } catch (err) {
     console.warn('[AI Studio] Proxy processing error, bypassing:', err);

@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { pool } from "./db";
+import { getAuroraPool } from "./db.ts";
 
 let prismaClient: any;
 
 try {
-  const adapter = new PrismaPg(pool);
+  const adapter = new PrismaPg(getAuroraPool());
   prismaClient = new PrismaClient({ adapter });
 } catch {
   console.warn('[AI Studio] Database not connected — using Prisma mock');

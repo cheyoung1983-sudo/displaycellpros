@@ -3,8 +3,7 @@ import { auth0 } from '@/lib/auth0';
 
 export async function GET(request: NextRequest) {
   try {
-    const res = new NextResponse();
-    const session = await auth0.getSession(request, res);
+    const session = await auth0.getSession(request);
     if (!session || !session.user) {
       return NextResponse.json({ user: null }, { status: 401 });
     }
