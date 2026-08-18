@@ -1,6 +1,8 @@
 # Project Completion Plan: Display & Cell Pros Web Platform
 
-> **Status:** Diagnostic complete, grounded in a live `npm install` + `npx tsc --noEmit` + `npm run build` run against the current `main` branch on 2026-08-18. Numbers and file paths below are from that run, not guesses.
+> **Status:** Phases 1-7 executed on 2026-08-18. See "Execution notes" at the bottom for what actually happened, including one correction to the plan below (Phase 3) discovered mid-execution. `npx tsc --noEmit`, `npm run lint`, `npm test`, and `npm run build` all pass cleanly from a fresh `npm ci` as of the last commit in this series.
+
+> **Original diagnostic below,** grounded in a live `npm install` + `npx tsc --noEmit` + `npm run build` run against `main` on 2026-08-18. Numbers and file paths are from that run.
 
 ## 1. What this project is
 
@@ -132,3 +134,23 @@ These are product/architecture calls, not typos. Recommended defaults are marked
 ## 5. Suggested execution order for an agentic worker
 
 Phases 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 map directly to git-committable checkpoints; recommend one commit per phase (matching this repo's existing plan-doc convention), re-running `npx tsc --noEmit` and `npm run build` after every phase to confirm forward progress before moving on.
+
+## 6. Execution notes (2026-08-18)
+
+All phases executed against `main`, one commit each:
+
+- **Phase 0 decisions used:** delete the legacy Vite SPA (confirmed with the repo owner before deleting, since the component tree turned out to implement real repair-ops features — see Phase 1 note); consolidate the DB layer onto `serverDb.ts` (not `aurora.ts` — see Phase 2 note); standardize tests on Jest.
+- **Phase 1:** Before deleting, ran an import-graph reachability analysis and found the "legacy SPA" wasn't just scaffold cruft — it included a substantial, mostly-finished repair-ops component library (`IntakeForm`, `RepairStatusTracker`, `TechnicianChecklist`, `RepairAnalytics`, `InventoryManagement`, device QR/NFC scanning, pricing calculator, completion-date estimator, supported-devices database) that was never ported into `src/app`. Flagged this to the repo owner explicitly before deleting anything; they confirmed deletion. Removed 86 files total (the SPA plus a couple of already-dead, unrelated files it surfaced: `Checkout.tsx`, `lib/stripe.ts`). `tsc` errors: 209 → 16.
+- **Phase 2:** Fixed the Auth0 v3/v4 mismatch by upgrading to v4.26.0 and finishing the v4 migration (SDK middleware now actually handles `/auth/*`, fixed `getSession` call signatures, fixed the `UserProvider` → `Auth0Provider` rename, fixed a `/api/auth/login` path typo, documented the missing `AUTH0_*`/`APP_BASE_URL` env vars). For the DB layer, picked **`serverDb.ts`** over `aurora.ts` as canonical — inspection showed `serverDb.ts` (read-replica split, retry logic, telemetry) is the more complete implementation and is the one whose env var names (`PG_MAX_POOL`, `PG_RO_MAX_POOL`, etc.) actually match `.env.example`; `aurora.ts` was a simpler, entirely unused duplicate. Deleted `db.ts` (dead offline-hooks code from the removed SPA) and repointed its two real consumers plus `prisma.ts` to `serverDb.ts`. `tsc` errors: 16 → 1. **`next build` succeeds for the first time.**
+- **Phase 3 — corrected:** Deeper investigation showed Auth0 and NextAuth are **not** duplicates of each other. Auth0 is the site-wide customer/technician auth (root layout, homepage, `/lab`, MCP OAuth routes). NextAuth is a narrow, separate "Sign in with Vercel" OAuth-code-exchange flow with its own Prisma-backed tables. No consolidation was performed; both were kept as-is. (This corrects the original Phase 0/3 recommendation above, which was based on a `grep` count taken before the Phase 1 cleanup and undercounted Auth0's real footprint.)
+- **Phase 4:** The one remaining `tsc` error (`schemas.test.ts` importing `vitest`) was resolved as part of Phase 5. `tsc --noEmit` is now 0 errors.
+- **Phase 5:** Deleted `scripts/run-all-tests.ts` (the old `npm test` runner — it only tested modules removed in Phase 1 and could no longer run). Wired `npm test`/`npm test:all` to Jest. Discovered Jest itself was non-functional even in isolation (`jest-environment-jsdom`, `@testing-library/dom`, `@testing-library/jest-dom` were all missing despite being assumed by `jest.config.ts`/`jest.setup.ts`); added them. Added the missing `tsx` devDependency `test:shopify` depends on. `npm test`: 5/5 passing.
+- **Phase 6:** Deleted the stale `next.config.__vercel_builder_backup__.js`. Added `.nvmrc` + `package.json` `engines` pinning Node 22 (matching CI). Rewrote `README.md`, which still documented the deleted AI Studio/Vite app. Also discovered `npm run lint` couldn't run at all — `eslint` wasn't installed despite CI gating on it; added `eslint` + `eslint-config-next` (pinned to the v9 line `next lint` on Next 15.5 actually supports — v10 removes APIs it depends on) and fixed the one resulting lint error (`no-sync-scripts` in `layout.tsx`, switched to `next/script`).
+- **Phase 7:** Verified from a from-scratch `rm -rf node_modules .next && npm ci` (matching CI's `npm ci`, not the faster `npm install`): `tsc --noEmit` clean, `npm run lint` exits 0 (one pre-existing, non-blocking `react-hooks/exhaustive-deps` warning left in `QrScannerModal.tsx` as a follow-up), `npm test` 5/5, `npm run build` succeeds.
+
+### Known follow-ups not covered by this pass
+
+- `QrScannerModal.tsx`'s `useEffect` has a deliberate-looking but unverified missing-dependency warning (`onClose`/`onScanSuccess`) — left alone to avoid an unreviewed behavior change to camera-scanning lifecycle.
+- `.github/workflows/webpack.yml` ("Node.js CI & Build") duplicates `.github/workflows/deploy.yml`'s lint/test/build checks on every push/PR to `main` (across a Node 20/22 matrix, without the `tsc --noEmit` step `deploy.yml` has). Both will now pass, but running two near-identical workflows on every push is redundant CI spend — worth a deliberate decision (merge, or drop one) rather than a silent deletion here.
+- Real Auth0 tenant credentials (`AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_SECRET`) and the DB env vars need to be confirmed as set in Vercel's project settings — this pass only fixed the code path and documented the variables in `.env.example`; it could not exercise a real login flow or DB connection in this sandbox.
+- Phase 8 (mobile expansion) from the original plan is still untouched, as intended.
