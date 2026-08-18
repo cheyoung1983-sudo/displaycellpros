@@ -1,14 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { pool } from "./db";
+import { getDatabasePool, isDbConfigured } from "./serverDb";
 
 let prismaClient: any;
 
 try {
-  const adapter = new PrismaPg(pool);
+  if (!isDbConfigured()) throw new Error("Database not configured");
+  const adapter = new PrismaPg(getDatabasePool());
   prismaClient = new PrismaClient({ adapter });
 } catch {
-  console.warn('[AI Studio] Database not connected — using Prisma mock');
+  console.warn('[Prisma] Database not connected — using Prisma mock');
   const noOp = {
     findMany: async () => [],
     findFirst: async () => null,

@@ -6,6 +6,12 @@ import { validateLexicalPayload } from '@/lib/lexical-firewall';
 export async function proxy(request: Request) {
   const url = new URL(request.url);
 
+  // Auth0 SDK v4 owns /auth/login, /auth/logout, /auth/callback, /auth/profile,
+  // /auth/access-token and /auth/backchannel-logout, and rolls the session cookie
+  // on every request. Route everything through it; for non-auth paths this is
+  // an effective passthrough carrying any refreshed session cookie forward.
+  const auth0Response = await auth0.middleware(request);
+
   // Handle /welcome and /api/welcome via Edge Config
   if (url.pathname === '/welcome' || url.pathname === '/api/welcome') {
     try {
@@ -41,11 +47,9 @@ export async function proxy(request: Request) {
   }
 
   try {
-    // Auth0 middleware is handled via handleAuth() routes in Next.js 13+ App Router
-    // for standard authentication flows. 
-    return NextResponse.next();
+    return auth0Response;
   } catch (err) {
-    console.warn('[AI Studio] Proxy processing error, bypassing:', err);
+    console.warn('[Proxy] Processing error, bypassing:', err);
     return NextResponse.next();
   }
 }
