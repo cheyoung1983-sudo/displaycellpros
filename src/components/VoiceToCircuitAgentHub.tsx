@@ -15,7 +15,7 @@ import {
   Zap
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export default function VoiceToCircuitAgentHub() {
   const { showToast } = useToast();

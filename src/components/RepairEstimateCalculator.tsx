@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { ServiceTier, Manufacturer } from '../types';
 import { calculateQuote, PricingBreakdown, PRICING_TIERS } from '../lib/pricing';
-import StripeCheckoutModal from './StripeCheckoutModal.tsx';
+import StripeCheckoutModal from './StripeCheckoutModal';
 
 const ISSUES = [
   { 

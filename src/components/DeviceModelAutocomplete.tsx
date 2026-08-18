@@ -19,8 +19,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   SUPPORTED_DEVICES_DATABASE, 
   SupportedDeviceModel 
-} from '../data/supportedDevicesData.ts';
-import { Manufacturer } from '../types.ts';
+} from '../data/supportedDevicesData';
+import { Manufacturer } from '../types';
 
 interface DeviceModelAutocompleteProps {
   value: string;

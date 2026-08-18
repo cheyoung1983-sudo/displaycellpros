@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 import { 
   Calendar as CalendarIcon, 
   Clock, 

@@ -31,7 +31,7 @@ import {
   Key,
   Database
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 interface TelemetryPoint {
   time: string;

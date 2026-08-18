@@ -42,24 +42,24 @@ import {
   IntakeFormSchema, 
   Manufacturer, 
   ServiceTier 
-} from '../types.ts';
-import { cn } from '../lib/utils.ts';
-import { calculateQuote, PricingBreakdown } from '../lib/pricing.ts';
-import { downloadDatabaseBackup, saveOfflineRepairIntake } from '../lib/offline-db';
-import AIDiagnostic from './AIDiagnostic.tsx';
-import DeviceCameraCapture, { CapturedPhoto } from './DeviceCameraCapture.tsx';
-import TechnicianChecklist from './TechnicianChecklist.tsx';
-import SmartTriageChat from './SmartTriageChat.tsx';
-import { useToast } from './Toast.tsx';
-import SymptomChecklist, { DIAGNOSTIC_SYMPTOMS, SymptomItem } from './SymptomChecklist.tsx';
-import DevicePhotoCaptureInput from './DevicePhotoCaptureInput.tsx';
-import CommonRepairChecklist from './CommonRepairChecklist.tsx';
-import RecommendedDiagnosticPath from './RecommendedDiagnosticPath.tsx';
-import DeviceModelAutocomplete from './DeviceModelAutocomplete.tsx';
-import BarcodeScannerModal, { ScannedHardwareData } from './BarcodeScannerModal.tsx';
-import HardwareDiagnosticTool from './HardwareDiagnosticTool.tsx';
-import DiagnosticChecklist, { FailurePointItem, COMMON_HARDWARE_FAILURE_POINTS } from './DiagnosticChecklist.tsx';
-import { broadcastTechnicianIntakeAlert } from '../lib/technicianEvents.ts';
+} from '../types';
+import { cn } from '../lib/utils';
+import { calculateQuote, PricingBreakdown } from '../lib/pricing';
+import { downloadDatabaseBackup, saveOfflineRepairIntake } from '../lib/db';
+import AIDiagnostic from './AIDiagnostic';
+import DeviceCameraCapture, { CapturedPhoto } from './DeviceCameraCapture';
+import TechnicianChecklist from './TechnicianChecklist';
+import SmartTriageChat from './SmartTriageChat';
+import { useToast } from './Toast';
+import SymptomChecklist, { DIAGNOSTIC_SYMPTOMS, SymptomItem } from './SymptomChecklist';
+import DevicePhotoCaptureInput from './DevicePhotoCaptureInput';
+import CommonRepairChecklist from './CommonRepairChecklist';
+import RecommendedDiagnosticPath from './RecommendedDiagnosticPath';
+import DeviceModelAutocomplete from './DeviceModelAutocomplete';
+import BarcodeScannerModal, { ScannedHardwareData } from './BarcodeScannerModal';
+import HardwareDiagnosticTool from './HardwareDiagnosticTool';
+import DiagnosticChecklist, { FailurePointItem, COMMON_HARDWARE_FAILURE_POINTS } from './DiagnosticChecklist';
+import { broadcastTechnicianIntakeAlert } from '../lib/technicianEvents';
 
 const STEPS = [
   { id: 1, name: 'Reconnaissance', icon: Smartphone },

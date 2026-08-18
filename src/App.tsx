@@ -38,39 +38,40 @@ import {
   Zap,
   RotateCcw
 } from 'lucide-react';
-import LocalLabBanner from './components/LocalLabBanner.tsx';
-import SEO from './components/SEO.tsx';
-import OfflineStatusBanner from './components/OfflineStatusBanner.tsx';
-import A11yInspector from './components/A11yInspector.tsx';
-import Auth0UserButton from './components/Auth0UserButton.tsx';
-import { ToastProvider } from './components/Toast.tsx';
-import LabBenchParticles from './components/LabBenchParticles.tsx';
-import VoiceIntakeModal, { VoiceIntakeTicket } from './components/VoiceIntakeModal.tsx';
-import { useFounderAnimationSpeed } from './hooks/useFounderAnimationSpeed.ts';
-import ryanYoungImage from './assets/images/regenerated_image_1786855284519.jpg';
+import LocalLabBanner from './components/LocalLabBanner';
+import SEO from './components/SEO';
+import OfflineStatusBanner from './components/OfflineStatusBanner';
+import A11yInspector from './components/A11yInspector';
+import Auth0UserButton from './components/Auth0UserButton';
+import { ToastProvider } from './components/Toast';
+import LabBenchParticles from './components/LabBenchParticles';
+import VoiceIntakeModal, { VoiceIntakeTicket } from './components/VoiceIntakeModal';
+import { useFounderAnimationSpeed } from './hooks/useFounderAnimationSpeed';
+import ryanYoungImageImport from './assets/images/regenerated_image_1786855284519.jpg';
+const ryanYoungImage = typeof ryanYoungImageImport === 'string' ? ryanYoungImageImport : ryanYoungImageImport.src;
 
 // Code-split dynamic views with React.lazy for optimized bundle performance
-const IntakeForm = lazy(() => import('./components/IntakeForm.tsx'));
-const HardwareDiagnosticTool = lazy(() => import('./components/HardwareDiagnosticTool.tsx'));
-const FeaturedProducts = lazy(() => import('./components/FeaturedProducts.tsx'));
-const AboutUs = lazy(() => import('./components/AboutUs.tsx'));
-const Reviews = lazy(() => import('./components/Reviews.tsx'));
-const RepairStatusTracker = lazy(() => import('./components/RepairStatusTracker.tsx'));
-const RepairEstimateCalculator = lazy(() => import('./components/RepairEstimateCalculator.tsx'));
-const ContactSupport = lazy(() => import('./components/ContactSupport.tsx'));
-const RepairAcademy = lazy(() => import('./components/RepairAcademy.tsx'));
-const ServiceBooking = lazy(() => import('./components/ServiceBooking.tsx'));
-const RepairAnalytics = lazy(() => import('./components/RepairAnalytics.tsx'));
-const SupportedDevicesDatabase = lazy(() => import('./components/SupportedDevicesDatabase.tsx'));
-const CompanyBlueprintGovernance = lazy(() => import('./components/CompanyBlueprintGovernance.tsx'));
-const ElevenLabsVoiceGenerator = lazy(() => import('./components/ElevenLabsVoiceGenerator.tsx'));
-const ElevenLabsProceduresManager = lazy(() => import('./components/ElevenLabsProceduresManager.tsx'));
-const ElevenLabsConversationFlow = lazy(() => import('./components/ElevenLabsConversationFlow.tsx'));
-const ElevenLabsVoiceStudioSettings = lazy(() => import('./components/ElevenLabsVoiceStudioSettings.tsx'));
-const VoiceToCircuitAgentHub = lazy(() => import('./components/VoiceToCircuitAgentHub.tsx'));
-const ElevenAgentInspector = lazy(() => import('./components/ElevenAgentInspector.tsx'));
-const Auth0FlowsHub = lazy(() => import('./components/Auth0FlowsHub.tsx'));
-const ElevenKnowledgeAndToolsHub = lazy(() => import('./components/ElevenKnowledgeAndToolsHub.tsx'));
+const IntakeForm = lazy(() => import('./components/IntakeForm'));
+const HardwareDiagnosticTool = lazy(() => import('./components/HardwareDiagnosticTool'));
+const FeaturedProducts = lazy(() => import('./components/FeaturedProducts'));
+const AboutUs = lazy(() => import('./components/AboutUs'));
+const Reviews = lazy(() => import('./components/Reviews'));
+const RepairStatusTracker = lazy(() => import('./components/RepairStatusTracker'));
+const RepairEstimateCalculator = lazy(() => import('./components/RepairEstimateCalculator'));
+const ContactSupport = lazy(() => import('./components/ContactSupport'));
+const RepairAcademy = lazy(() => import('./components/RepairAcademy'));
+const ServiceBooking = lazy(() => import('./components/ServiceBooking'));
+const RepairAnalytics = lazy(() => import('./components/RepairAnalytics'));
+const SupportedDevicesDatabase = lazy(() => import('./components/SupportedDevicesDatabase'));
+const CompanyBlueprintGovernance = lazy(() => import('./components/CompanyBlueprintGovernance'));
+const ElevenLabsVoiceGenerator = lazy(() => import('./components/ElevenLabsVoiceGenerator'));
+const ElevenLabsProceduresManager = lazy(() => import('./components/ElevenLabsProceduresManager'));
+const ElevenLabsConversationFlow = lazy(() => import('./components/ElevenLabsConversationFlow'));
+const ElevenLabsVoiceStudioSettings = lazy(() => import('./components/ElevenLabsVoiceStudioSettings'));
+const VoiceToCircuitAgentHub = lazy(() => import('./components/VoiceToCircuitAgentHub'));
+const ElevenAgentInspector = lazy(() => import('./components/ElevenAgentInspector'));
+const Auth0FlowsHub = lazy(() => import('./components/Auth0FlowsHub'));
+const ElevenKnowledgeAndToolsHub = lazy(() => import('./components/ElevenKnowledgeAndToolsHub'));
 
 function TabLoadingSkeleton() {
   return (
@@ -800,7 +801,7 @@ export default function App() {
           </div>
         </div>
       </footer>
-      {import.meta.env.PROD && typeof window !== 'undefined' && window.location.hostname.includes('vercel') && (
+      {process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && window.location.hostname.includes('vercel') && (
         <>
           <Analytics />
           <SpeedInsights />

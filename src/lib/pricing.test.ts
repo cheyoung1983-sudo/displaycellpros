@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { calculateQuote, PRICING_TIERS, TAX_RATES } from './pricing.ts';
-import { ServiceTier } from '../types.ts';
+import { calculateQuote, PRICING_TIERS, TAX_RATES } from './pricing';
+import { ServiceTier } from '../types';
 
 describe('Pricing calculations', () => {
   it('calculates Tier 1 Power quote with standard Spokane City tax', () => {

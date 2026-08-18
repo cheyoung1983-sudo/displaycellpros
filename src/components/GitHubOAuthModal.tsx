@@ -27,7 +27,7 @@ import {
   Bug,
   Plus
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 interface GitHubOAuthModalProps {
   isOpen: boolean;

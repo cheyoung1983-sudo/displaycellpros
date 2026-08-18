@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useSafeAuth0 } from './Auth0ProviderWithConfig.tsx';
+import { useSafeAuth0 } from './Auth0ProviderWithConfig';
 import { User, Mail, ShieldCheck, LogIn, Loader2, Sparkles, Key, Shield, Layers, Github } from 'lucide-react';
 import { motion } from 'motion/react';
-import { evaluateUserRbac } from '../lib/auth0Rbac.ts';
-import Auth0RbacModal from './Auth0RbacModal.tsx';
-import GitHubOAuthModal from './GitHubOAuthModal.tsx';
+import { evaluateUserRbac } from '../lib/auth0Rbac';
+import Auth0RbacModal from './Auth0RbacModal';
+import GitHubOAuthModal from './GitHubOAuthModal';
 
 export default function UserProfile() {
   const { user, isLoading, isAuthenticated, isConfigured, loginWithRedirect } = useSafeAuth0();

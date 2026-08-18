@@ -16,8 +16,8 @@ const SafeAuth0Context = createContext<Auth0ContextType | null>(null);
 
 export function isAuth0Configured(): boolean {
   return Boolean(
-    import.meta.env.VITE_AUTH0_DOMAIN && 
-    import.meta.env.VITE_AUTH0_CLIENT_ID
+    (process.env.NEXT_PUBLIC_AUTH0_DOMAIN || process.env.VITE_AUTH0_DOMAIN) && 
+    (process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || process.env.VITE_AUTH0_CLIENT_ID)
   );
 }
 
@@ -70,9 +70,9 @@ interface Auth0ProviderWithConfigProps {
 }
 
 export function Auth0ProviderWithConfig({ children }: Auth0ProviderWithConfigProps) {
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN;
-  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-  const audience = import.meta.env.VITE_AUTH0_AUDIENCE || 'https://api.displaycellpros.com';
+  const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN || process.env.VITE_AUTH0_DOMAIN;
+  const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || process.env.VITE_AUTH0_CLIENT_ID;
+  const audience = process.env.NEXT_PUBLIC_AUTH0_AUDIENCE || process.env.VITE_AUTH0_AUDIENCE || 'https://api.displaycellpros.com';
 
   if (!domain || !clientId) {
     return <FallbackAuth0Provider>{children}</FallbackAuth0Provider>;

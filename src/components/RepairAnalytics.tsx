@@ -9,13 +9,13 @@ import {
   Cpu, Zap, ShieldCheck, RefreshCw, BarChart3, Wrench, Layers, UserCheck, GitCommit, GitMerge, FileCheck, Package,
   Database
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
-import DiagnosticPortMonitor from './DiagnosticPortMonitor.tsx';
-import ChainOfVerificationVisualizer from './ChainOfVerificationVisualizer.tsx';
-import DataSanitizationCertificate from './DataSanitizationCertificate.tsx';
-import AssetManager from './AssetManager.tsx';
-import InventoryManagement from './InventoryManagement.tsx';
-import DatabaseOptimizationPanel from './DatabaseOptimizationPanel.tsx';
+import { useToast } from './Toast';
+import DiagnosticPortMonitor from './DiagnosticPortMonitor';
+import ChainOfVerificationVisualizer from './ChainOfVerificationVisualizer';
+import DataSanitizationCertificate from './DataSanitizationCertificate';
+import AssetManager from './AssetManager';
+import InventoryManagement from './InventoryManagement';
+import DatabaseOptimizationPanel from './DatabaseOptimizationPanel';
 
 // Turnaround time and repair completion volume trend datasets by granularity
 export const TURNAROUND_TREND_DATA_DAILY = [

@@ -7,8 +7,8 @@ import { useState } from 'react';
 import { Sparkles, Brain, Loader2, Github, CheckCircle2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
-import { TelemetryData } from '../types.ts';
-import { useToast } from './Toast.tsx';
+import { TelemetryData } from '../types';
+import { useToast } from './Toast';
 
 interface AIDiagnosticProps {
   telemetry: TelemetryData;

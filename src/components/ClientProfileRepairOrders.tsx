@@ -45,10 +45,10 @@ import {
   CreditCard,
   Hash
 } from 'lucide-react';
-import { useSafeAuth0 } from './Auth0ProviderWithConfig.tsx';
-import { useToast } from './Toast.tsx';
-import { useDatabase } from '../lib/offline-db';
-import { calculateDynamicCompletionDate } from '../utils/completionCalculator.ts';
+import { useSafeAuth0 } from './Auth0ProviderWithConfig';
+import { useToast } from './Toast';
+import { useDatabase } from '../lib/db';
+import { calculateDynamicCompletionDate } from '../utils/completionCalculator';
 
 export interface RepairOrderCost {
   partsCost: number;

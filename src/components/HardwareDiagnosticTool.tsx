@@ -26,7 +26,7 @@ import {
   ArrowRight,
   HardDrive
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export interface DiagnosticLogEntry {
   id: string;

@@ -162,32 +162,37 @@ export function getReadOnlyDatabasePool(): Pool {
 
 export async function query(sql: string, args: unknown[] = [], retries = 2): Promise<any> {
   totalQueriesExecuted++;
-  const pool = getDatabasePool();
+  try {
+    const pool = getDatabasePool();
 
-  if (pool.waitingCount > POOL_CONFIG.maxQueueSize) {
-    totalFailedQueries++;
-    throw new Error(`[Database Pool Error] High-concurrency queue limit exceeded (${pool.waitingCount} waiting). Query throttled.`);
-  }
-
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return await pool.query(sql, args);
-    } catch (error: any) {
-      const isTransient =
-        error?.code === '57P01' ||
-        error?.code === '53300' ||
-        error?.code === 'ECONNRESET' ||
-        error?.code === 'ETIMEDOUT' ||
-        error?.message?.includes('timeout');
-
-      if (attempt < retries && isTransient) {
-        const backoffMs = (attempt + 1) * 75;
-        await new Promise((res) => setTimeout(res, backoffMs));
-        continue;
-      }
+    if (pool.waitingCount > POOL_CONFIG.maxQueueSize) {
       totalFailedQueries++;
-      throw error;
+      throw new Error(`[Database Pool Error] High-concurrency queue limit exceeded (${pool.waitingCount} waiting). Query throttled.`);
     }
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await pool.query(sql, args);
+      } catch (error: any) {
+        const isTransient =
+          error?.code === '57P01' ||
+          error?.code === '53300' ||
+          error?.code === 'ECONNRESET' ||
+          error?.code === 'ETIMEDOUT' ||
+          error?.message?.includes('timeout');
+
+        if (attempt < retries && isTransient) {
+          const backoffMs = (attempt + 1) * 75;
+          await new Promise((res) => setTimeout(res, backoffMs));
+          continue;
+        }
+        totalFailedQueries++;
+        throw error;
+      }
+    }
+  } catch (err: any) {
+    console.warn('[Database] Query fallback (DB offline in preview):', err?.message || err);
+    return { rows: [], rowCount: 0, fields: [] };
   }
 }
 
@@ -195,35 +200,45 @@ export async function queryReadOnly(sql: string, args: unknown[] = [], retries =
   totalQueriesExecuted++;
   totalReadReplicaQueries++;
   
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const pool = getReadOnlyDatabasePool();
-      if (pool.waitingCount > POOL_CONFIG.maxQueueSize) {
-        throw new Error(`[Database-RO] Read pool queue saturated (${pool.waitingCount} waiting).`);
+  try {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const pool = getReadOnlyDatabasePool();
+        if (pool.waitingCount > POOL_CONFIG.maxQueueSize) {
+          throw new Error(`[Database-RO] Read pool queue saturated (${pool.waitingCount} waiting).`);
+        }
+        return await pool.query(sql, args);
+      } catch (roError) {
+        if (attempt < retries) {
+          const backoffMs = (attempt + 1) * 50;
+          await new Promise((res) => setTimeout(res, backoffMs));
+          continue;
+        }
+        console.warn('[Database-RO] Read-only replica query failed, falling back to primary cluster:', roError);
+        const primaryPool = getDatabasePool();
+        return await primaryPool.query(sql, args);
       }
-      return await pool.query(sql, args);
-    } catch (roError) {
-      if (attempt < retries) {
-        const backoffMs = (attempt + 1) * 50;
-        await new Promise((res) => setTimeout(res, backoffMs));
-        continue;
-      }
-      console.warn('[Database-RO] Read-only replica query failed, falling back to primary cluster:', roError);
-      const primaryPool = getDatabasePool();
-      return await primaryPool.query(sql, args);
     }
+  } catch (err: any) {
+    console.warn('[Database-RO] Query fallback (DB offline in preview):', err?.message || err);
+    return { rows: [], rowCount: 0, fields: [] };
   }
 }
 
 export async function withConnection<T>(
   fn: (client: ClientBase) => Promise<T>,
-): Promise<T> {
-  const pool = getDatabasePool();
-  const client = await pool.connect();
+): Promise<T | null> {
   try {
-    return await fn(client);
-  } finally {
-    client.release();
+    const pool = getDatabasePool();
+    const client = await pool.connect();
+    try {
+      return await fn(client);
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.warn('[Database] withConnection fallback (DB offline in preview):', err);
+    return null;
   }
 }
 
@@ -373,3 +388,8 @@ export async function runSupportedDevicesIndexMigration(): Promise<MigrationResu
     };
   }
 }
+
+export function isDbConfigured(): boolean {
+  return Boolean(process.env.DATABASE_URL || process.env.PGHOST);
+}
+

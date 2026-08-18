@@ -19,7 +19,7 @@ import {
   Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ServiceTier } from '../types.ts';
+import { ServiceTier } from '../types';
 
 export interface SymptomItem {
   id: string;

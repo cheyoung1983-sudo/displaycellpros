@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { VoiceIntakeTicket } from './VoiceIntakeModal.tsx';
+import type { VoiceIntakeTicket } from './VoiceIntakeModal';
 
 describe('VoiceIntake Data Model', () => {
   it('correctly structures voice intake ticket payload', () => {

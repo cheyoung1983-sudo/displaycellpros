@@ -6,8 +6,8 @@ import { validateLexicalPayload } from '@/lib/lexical-firewall';
 export async function proxy(request: Request) {
   const url = new URL(request.url);
 
-  // Handle /welcome and /api/welcome via Edge Config
-  if (url.pathname === '/welcome' || url.pathname === '/api/welcome') {
+  // Handle /api/welcome via Edge Config
+  if (url.pathname === '/api/welcome') {
     try {
       const greeting = await get('greeting');
       return NextResponse.json({

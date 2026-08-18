@@ -10,8 +10,8 @@ import {
   exportDatabaseRecordsAsJson,
   exportDatabaseRecordsAsCsv,
   downloadDatabaseBackup,
-} from './offline-db';
-import { Manufacturer, ServiceTier } from '../types.ts';
+} from './db';
+import { Manufacturer, ServiceTier } from '../types';
 
 describe('Local SQLite Database & Offline Intake Store', () => {
   beforeEach(async () => {

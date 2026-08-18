@@ -14,7 +14,7 @@ import {
   Send,
   FileText
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 interface WarrantyTrackerCardProps {
   ticketNumber: string;

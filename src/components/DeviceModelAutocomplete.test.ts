@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SUPPORTED_DEVICES_DATABASE } from '../data/supportedDevicesData.ts';
+import { SUPPORTED_DEVICES_DATABASE } from '../data/supportedDevicesData';
 
 describe('SupportedDevicesDatabase Autocomplete filtering', () => {
   it('contains supported devices database records', () => {

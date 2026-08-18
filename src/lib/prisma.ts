@@ -1,12 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { pool } from "./db";
 
 let prismaClient: any;
 
 try {
-  const adapter = new PrismaPg(pool);
-  prismaClient = new PrismaClient({ adapter });
+  prismaClient = new PrismaClient();
 } catch {
   console.warn('[AI Studio] Database not connected — using Prisma mock');
   const noOp = {
@@ -22,3 +19,4 @@ try {
 
 export const prisma = prismaClient;
 export default prisma;
+

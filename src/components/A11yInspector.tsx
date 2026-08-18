@@ -17,7 +17,7 @@ import {
   ShieldAlert,
   Info
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export interface A11yIssue {
   id: string;
