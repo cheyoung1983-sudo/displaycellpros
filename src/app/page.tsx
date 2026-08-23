@@ -1,279 +1,86 @@
-'use client';
+import Link from 'next/link';
+import { ServiceCard } from '@/components/service-card';
+import { bookingUrl } from '@/lib/site';
 
-import React, { useState, useEffect } from 'react';
-import { Smartphone, Shield, Wrench, MapPin, CheckCircle2, Phone, Clock, DollarSign, Activity, AlertCircle } from 'lucide-react';
+const checkoutCategories = [
+  { number: '01', title: 'Display repair', detail: 'Cracked glass, touch issues, black screens, and display damage.', href: '/services/display-repair' },
+  { number: '02', title: 'Power and charging', detail: 'Battery, charging port, and power-related repair concerns.', href: '/services/cell-phone-repair' },
+  { number: '03', title: 'Device assessment', detail: 'Not sure what is wrong? Start with a clear repair conversation.', href: '/quote' },
+];
 
-export default function Home() {
-  const [device, setDevice] = useState('iphone-15');
-  const [repairType, setRepairType] = useState('screen');
-  const [submitted, setSubmitted] = useState(false);
-  const [loadingAssessment, setLoadingAssessment] = useState(false);
-  const [assessmentData, setAssessmentData] = useState<any>(null);
-  const [assessmentError, setAssessmentError] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    // Define global onSubmit callback required by reCAPTCHA button and assessment endpoint
-    (window as any).onSubmit = async (token: string) => {
-      console.log('reCAPTCHA Enterprise token verified:', token);
-      setLoadingAssessment(true);
-      setAssessmentError(null);
-
-      try {
-        const payload = {
-          event: {
-            token: token,
-            expectedAction: 'submit',
-            siteKey: '6LcB60UtAAAAAEk-ADlBMnuUjbWXddXTyXLcmoSj'
-          }
-        };
-
-        const res = await fetch('/api/recaptcha/assess', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || 'Assessment failed');
-        }
-
-        setAssessmentData(data);
-        setSubmitted(true);
-      } catch (err: any) {
-        console.error('Assessment error:', err);
-        setAssessmentError(err.message || 'Failed to complete assessment');
-        // Fallback successful display for offline/preview environments
-        setAssessmentData({
-          success: true,
-          valid: true,
-          actionMatched: true,
-          score: 0.9,
-          reasons: ['AUTOMATION', 'INTERACTION_ADHERENCE'],
-          assessmentName: 'assessment-fallback-' + Date.now()
-        });
-        setSubmitted(true);
-      } finally {
-        setLoadingAssessment(false);
-      }
-    };
-  }, []);
-
-  const calculatePrice = () => {
-    let base = 89;
-    if (device.includes('pro') || device.includes('ultra')) base = 149;
-    if (repairType === 'battery') base = 79;
-    if (repairType === 'charging') base = 69;
-    // Margin-shielding pricing formula: Customer Price = Parts Cost + Labor ($50/hr) + 80% Profit/Overhead Markup
-    return base;
-  };
-
+export default function HomePage() {
   return (
-    <div className="space-y-16 pb-16">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-900 to-slate-900 text-white py-20 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
-        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          <div className="inline-flex items-center gap-2 bg-blue-800/60 border border-blue-700/50 px-4 py-1.5 rounded-full text-sm font-medium text-blue-200">
-            <MapPin className="w-4 h-4 text-blue-400" /> Spokane & Spokane Valley, Washington On-Site Repair
+    <>
+      <section className="overflow-hidden bg-slate-950 py-16 text-white sm:py-24">
+        <div className="shell grid items-center gap-14 lg:grid-cols-[1.15fr_.85fr]">
+          <div>
+            <p className="inline-flex rounded-full border border-sky-300/30 bg-sky-300/10 px-3 py-1 text-xs font-bold tracking-[0.16em] text-sky-200">SPOKANE AND SPOKANE VALLEY</p>
+            <h1 className="mt-6 max-w-3xl text-5xl font-black tracking-tight sm:text-7xl">Device repair with a simpler path to <span className="text-sky-300">getting back to normal.</span></h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">Choose the repair you need, complete checkout, then reserve the intake time that works for you.</p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <a className="button-primary bg-sky-300 text-slate-950 hover:bg-sky-200" href="#checkout">Choose a repair</a>
+              <a className="button-secondary border-slate-600 text-white hover:bg-slate-800" href={bookingUrl}>Schedule an intake</a>
+            </div>
+            <p className="mt-6 text-sm text-slate-400">Soft operations: Thursdays and Fridays through October 1, 2026.</p>
           </div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
-            Mobile Electronics & Smartphone Repair <span className="text-blue-400">At Your Location</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto">
-            Expert technician deployment for iPhone & Samsung screen, battery, and charging port replacements. No travel fees within the Spokane metro area.
-          </p>
-          <div className="pt-4 flex flex-wrap justify-center gap-4">
-            <a href="#quote" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all">
-              Book On-Site Repair
-            </a>
-            <a href="#verify" className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3 rounded-xl border border-slate-700 transition-all">
-              Secure reCAPTCHA Test
-            </a>
+
+          <aside className="relative rounded-[2rem] border border-white/10 bg-white/5 p-7 backdrop-blur">
+            <div className="absolute -right-10 -top-10 size-36 rounded-full bg-sky-400/25 blur-3xl" />
+            <p className="text-sm font-bold text-sky-300">The repair flow</p>
+            <ol className="relative mt-7 space-y-6">
+              <li className="flex gap-4"><span className="grid size-8 shrink-0 place-items-center rounded-full bg-sky-300 font-black text-slate-950">1</span><div><strong>Choose your service</strong><p className="mt-1 text-sm leading-6 text-slate-300">Select the repair that matches your device concern.</p></div></li>
+              <li className="flex gap-4"><span className="grid size-8 shrink-0 place-items-center rounded-full bg-sky-300 font-black text-slate-950">2</span><div><strong>Complete checkout</strong><p className="mt-1 text-sm leading-6 text-slate-300">Your service checkout confirms the repair path.</p></div></li>
+              <li className="flex gap-4"><span className="grid size-8 shrink-0 place-items-center rounded-full bg-sky-300 font-black text-slate-950">3</span><div><strong>Book your intake</strong><p className="mt-1 text-sm leading-6 text-slate-300">Choose an available time through our scheduling calendar.</p></div></li>
+            </ol>
+          </aside>
+        </div>
+      </section>
+
+      <section className="shell py-20" id="checkout">
+        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+          <div className="max-w-2xl">
+            <p className="eyebrow">Step 1: choose a repair</p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">Start your repair checkout.</h2>
+            <p className="mt-4 leading-7 text-slate-600">Select the repair category that best matches your device. Individual checkout buttons are being added here next.</p>
+          </div>
+          <Link className="font-bold text-blue-800 underline" href="/services">Compare all services</Link>
+        </div>
+        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+          {checkoutCategories.map((category) => (
+            <article className="group rounded-[2rem] border border-sky-100 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:border-sky-300 hover:shadow-lg" key={category.title}>
+              <p className="font-mono text-sm font-bold text-blue-700">{category.number}</p>
+              <h3 className="mt-7 text-2xl font-black text-slate-950">{category.title}</h3>
+              <p className="mt-3 min-h-14 leading-7 text-slate-600">{category.detail}</p>
+              <Link className="button-primary mt-7 w-full" href={category.href}>View repair options</Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-sky-50 py-20">
+        <div className="shell grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
+          <div>
+            <p className="eyebrow">Need help deciding?</p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">Start with the symptom you can see.</h2>
+            <p className="mt-5 leading-8 text-slate-600">A cracked display, weak battery, or unreliable charging port each needs a different repair path. Tell us what is happening and we will help you choose.</p>
+            <Link className="button-secondary mt-7" href="/quote">Describe your device issue</Link>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <ServiceCard title="Display repair" description="Clear, responsive screen replacements for cracked, flickering, or unresponsive displays." href="/services/display-repair" />
+            <ServiceCard title="Cell phone repair" description="Practical support for batteries, charging ports, cameras, speakers, and more." href="/services/cell-phone-repair" />
           </div>
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-3 mb-12">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Core Operational Capabilities</h2>
-          <p className="text-slate-600 max-w-xl mx-auto">Utilizing Just-In-Time parts procurement with pristine execution standards.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">
-              <Smartphone className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900">Screen Replacements</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">
-              OLED and LCD digitizer assemblies for iPhone and Samsung Galaxy series with lifetime warranty on parts & labor.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">
-              <Wrench className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900">Battery & Power Diagnostics</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">
-              OEM-grade battery replacements and charging port micro-soldering services performed on-site in under 45 minutes.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">
-              <Shield className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900">Enterprise Security</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">
-              Enterprise-grade authentication, Auth0 proxy middleware, and Google reCAPTCHA Enterprise bot defense integrated across all client portals.
-            </p>
+      <section className="shell py-20">
+        <div className="rounded-[2rem] bg-[linear-gradient(135deg,#0d4f8b_0%,#10233d_62%,#1a365d_100%)] p-8 text-white sm:p-12">
+          <p className="eyebrow text-sky-200">Ready to schedule?</p>
+          <div className="mt-3 flex flex-col justify-between gap-7 sm:flex-row sm:items-end">
+            <div><h2 className="max-w-2xl text-4xl font-black tracking-tight">Book an intake when you are ready to move forward.</h2><p className="mt-3 text-sky-100">You can also call <a className="font-bold underline" href="tel:+15099036139">(509) 903-6139</a> for direct help.</p></div>
+            <a className="button-primary shrink-0 bg-sky-300 text-slate-950 hover:bg-sky-200" href={bookingUrl}>Open scheduling</a>
           </div>
         </div>
       </section>
-
-      {/* Instant Quote Calculator */}
-      <section id="quote" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-3xl shadow-lg border border-slate-200 p-8 sm:p-12 space-y-8">
-          <div className="border-b border-slate-100 pb-6">
-            <h2 className="text-2xl font-bold text-slate-900">Spokane On-Site Repair Quote Calculator</h2>
-            <p className="text-slate-600 text-sm mt-1">Transparent pricing computed via our margin-shielding operational formula.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Select Device Model</label>
-              <select 
-                value={device} 
-                onChange={(e) => setDevice(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="iphone-15">iPhone 15 / 15 Pro</option>
-                <option value="iphone-14">iPhone 14 Series</option>
-                <option value="iphone-13">iPhone 13 Series</option>
-                <option value="samsung-s24">Samsung Galaxy S24</option>
-                <option value="samsung-s23">Samsung Galaxy S23</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Select Repair Service</label>
-              <select 
-                value={repairType} 
-                onChange={(e) => setRepairType(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="screen">Screen Replacement</option>
-                <option value="battery">Battery Replacement</option>
-                <option value="charging">Charging Port Repair</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="bg-slate-50 p-6 rounded-2xl flex items-center justify-between border border-slate-200">
-            <div>
-              <p className="text-sm text-slate-500 font-medium">Estimated On-Site Price (Parts + Labor + Overhead)</p>
-              <p className="text-3xl font-extrabold text-blue-600 mt-1">${calculatePrice()}.00</p>
-            </div>
-            <div className="text-right hidden sm:block">
-              <p className="text-xs text-slate-500 flex items-center gap-1 justify-end">
-                <Clock className="w-3.5 h-3.5" /> Turnaround: ~30-45 mins
-              </p>
-              <p className="text-xs text-slate-500 flex items-center gap-1 justify-end mt-1">
-                <MapPin className="w-3.5 h-3.5" /> Spokane Metro Dispatch
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* reCAPTCHA Enterprise Verification Section */}
-      <section id="verify" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 space-y-6 shadow-xl">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Google reCAPTCHA Enterprise Verification</h2>
-            <p className="text-slate-400 text-sm">
-              Protected against automated bot traffic using site key <code className="bg-slate-800 text-blue-300 px-2 py-0.5 rounded text-xs font-mono">6LcB60UtAAAAAEk-ADlBMnuUjbWXddXTyXLcmoSj</code>.
-            </p>
-          </div>
-
-          <div className="pt-2">
-            {loadingAssessment ? (
-              <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-700 flex items-center justify-center space-x-3 text-slate-300">
-                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-sm font-medium">Analyzing reCAPTCHA Enterprise risk assessment...</span>
-              </div>
-            ) : submitted ? (
-              <div className="bg-emerald-950/60 border border-emerald-500/50 p-6 rounded-2xl space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-lg">
-                    <CheckCircle2 className="w-6 h-6" /> Assessment Verified Successfully
-                  </div>
-                  <button 
-                    onClick={() => { setSubmitted(false); setAssessmentData(null); }}
-                    className="text-xs bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 px-3 py-1 rounded-lg transition-colors cursor-pointer"
-                  >
-                    Reset Test
-                  </button>
-                </div>
-                
-                {assessmentData && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-emerald-800/50 text-xs">
-                    <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800/40">
-                      <p className="text-emerald-400 font-medium">Risk Score</p>
-                      <p className="text-2xl font-bold text-white mt-1">{assessmentData.score ?? 0.9}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Scale: 0.0 (bot) to 1.0 (legitimate)</p>
-                    </div>
-                    <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800/40">
-                      <p className="text-emerald-400 font-medium">Action & Validity</p>
-                      <p className="text-sm font-bold text-white mt-1">Action: 'submit' (Valid)</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Project: displaycellpros-com</p>
-                    </div>
-                    <div className="bg-emerald-900/40 p-3 rounded-xl border border-emerald-800/40">
-                      <p className="text-emerald-400 font-medium">Classification Reasons</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {assessmentData.reasons?.length ? assessmentData.reasons.map((r: string, i: number) => (
-                          <span key={i} className="bg-emerald-800 text-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-mono">{r}</span>
-                        )) : <span className="text-slate-300 text-[10px]">None</span>}
-                      </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5">ID: {assessmentData.assessmentName || 'N/A'}</p>
-                    </div>
-                  </div>
-                )}
-                
-                {assessmentData?.note && (
-                  <p className="text-[11px] text-emerald-300 italic">{assessmentData.note}</p>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-200">Click submit to execute reCAPTCHA enterprise check.</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Triggers `grecaptcha.enterprise.ready` and executes action 'submit' for siteKey <code className="text-blue-300 font-mono">6LcB60UtAAAAAEk-ADlBMnuUjbWXddXTyXLcmoSj</code>.</p>
-                </div>
-                {/* Exact requested button markup */}
-                {isMounted ? (
-                  <button 
-                    className="g-recaptcha bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all cursor-pointer"
-                    data-sitekey="6LcB60UtAAAAAEk-ADlBMnuUjbWXddXTyXLcmoSj"
-                    data-callback='onSubmit'
-                    data-action='submit'
-                  >
-                    Submit
-                  </button>
-                ) : (
-                  <button 
-                    disabled
-                    className="bg-blue-600/50 text-white font-semibold px-6 py-3 rounded-xl shadow-md cursor-not-allowed"
-                  >
-                    Loading...
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-    </div>
+    </>
   );
 }

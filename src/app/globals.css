@@ -1,2 +1,72 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+
+:root {
+  --ink: #10233d;
+  --ocean: #0d4f8b;
+  --sky: #e9f5ff;
+  --mint: #d9f7ed;
+  --warm: #fff7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f8fbff;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+.shell {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 0 1.25rem;
+}
+
+.eyebrow {
+  color: var(--ocean);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--ocean);
+  color: white;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  transition: background-color 150ms ease;
+}
+
+.button-primary:hover {
+  background: #083d6d;
+}
+
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b9cee2;
+  border-radius: 9999px;
+  color: var(--ink);
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+}
+
+.button-secondary:hover {
+  background: white;
+}
