@@ -6,15 +6,15 @@
     "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "prisma generate && next build",
     "start": "next start -p 3000",
-    "lint": "next lint",
-    "test": "tsx scripts/run-all-tests.ts",
+    "lint": "eslint .",
+    "test": "tsx scripts/run-all-tests.ts && vitest run --config vitest.config.ts",
     "test:all": "tsx scripts/run-all-tests.ts && tsx scripts/test-shopify.ts",
     "test:shopify": "tsx scripts/test-shopify.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.24.1",
-    "@auth0/nextjs-auth0": "3.5.0",
+    "@auth0/nextjs-auth0": "3.8.0",
     "@aws-sdk/cloudfront-signer": "^3.1098.0",
     "@aws-sdk/rds-signer": "^3.1105.0",
     "@google-cloud/recaptcha-enterprise": "^6.4.2",
@@ -32,7 +32,6 @@
     "@vercel/connect": "^0.8.0",
     "@vercel/edge-config": "^1.5.1",
     "@vercel/functions": "^3.9.3",
-    "@vercel/node": "^5.10.1",
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.56",
     "clsx": "^2.1.1",
@@ -44,7 +43,7 @@
     "jsqr": "^1.4.0",
     "lucide-react": "^0.475.0",
     "motion": "^12.4.0",
-    "next": "15.5.22",
+    "next": "16.3.2",
     "next-auth": "^4.24.15",
     "openai": "^7.4.0",
     "openid-client": "5.7.1",
@@ -70,8 +69,12 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.5.4",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.2",
     "postcss": "^8.0.0",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.0.0"
+    "tsx": "4.21.0",
+    "typescript": "^5.0.0",
+    "vitest": "3.2.7"
   }
 }

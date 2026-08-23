@@ -1,7 +1,24 @@
-import { auth0 } from "./lib/auth0";
 import { get } from "@vercel/edge-config";
 import { NextResponse } from 'next/server';
 import { validateLexicalPayload } from '@/lib/lexical-firewall';
+
+function applySecurityHeaders(response: NextResponse) {
+  if (process.env.NODE_ENV === 'production') {
+    const csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.google-analytics.com https://vercel.live https://*.vercel.live https://*.auth0.com",
+      "connect-src 'self' https://*.google.com https://*.google-analytics.com https://vercel.live https://*.vercel.live https://*.auth0.com https://displaycellpros.us.auth0.com wss://*.vercel.live",
+      "img-src 'self' data: blob: https://*.google.com https://*.google-analytics.com https://*.gstatic.com https://*.auth0.com https://*.githubusercontent.com https://picsum.photos https://*.picsum.photos https://images.unsplash.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "frame-src 'self' https://vercel.live https://*.vercel.live https://*.auth0.com",
+    ].join('; ');
+
+    response.headers.set('Content-Security-Policy', csp);
+  }
+
+  return response;
+}
 
 export async function proxy(request: Request) {
   const url = new URL(request.url);
@@ -10,16 +27,16 @@ export async function proxy(request: Request) {
   if (url.pathname === '/api/welcome') {
     try {
       const greeting = await get('greeting');
-      return NextResponse.json({
+      return applySecurityHeaders(NextResponse.json({
         greeting: greeting || "hello world",
         source: "vercel-edge-config-middleware"
-      });
+      }));
     } catch (err) {
-      return NextResponse.json({
+      return applySecurityHeaders(NextResponse.json({
         greeting: "hello world",
         source: "error-fallback",
         error: String(err)
-      });
+      }));
     }
   }
 
@@ -32,7 +49,7 @@ export async function proxy(request: Request) {
 
         if (!firewallCheck.isSafe) {
           console.warn(`[SECURITY ALERT] Payload blocked: ${firewallCheck.reason}`);
-          return NextResponse.json({ error: 'Invalid input syntax payload.' }, { status: 400 });
+          return applySecurityHeaders(NextResponse.json({ error: 'Invalid input syntax payload.' }, { status: 400 }));
         }
       } catch {
         // Not JSON or empty body
@@ -43,10 +60,10 @@ export async function proxy(request: Request) {
   try {
     // Auth0 middleware is handled via handleAuth() routes in Next.js 13+ App Router
     // for standard authentication flows. 
-    return NextResponse.next();
+    return applySecurityHeaders(NextResponse.next());
   } catch (err) {
     console.warn('[AI Studio] Proxy processing error, bypassing:', err);
-    return NextResponse.next();
+    return applySecurityHeaders(NextResponse.next());
   }
 }
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import ryanYoungAvatarImport from '../assets/images/regenerated_image_1786855284519.jpg';
-const ryanYoungAvatar = typeof ryanYoungAvatarImport === 'string' ? ryanYoungAvatarImport : ryanYoungAvatarImport.src;
+import ryanYoungAvatarImport from '../assets/images/regenerated_image_1786855135392.jpg';
+const ryanYoungAvatar = ryanYoungAvatarImport;
 import { useToast } from './Toast';
 import { 
   Send, 
