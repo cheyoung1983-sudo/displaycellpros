@@ -20,7 +20,7 @@ import {
   Camera,
   Radio
 } from 'lucide-react';
-import QRScannerModal from './QRScannerModal';
+import BarcodeScannerModal from './BarcodeScannerModal';
 import NFCScannerModal from './NFCScannerModal';
 import WarrantyTrackerCard from './WarrantyTrackerCard';
 import RepairTimeEstimator from './RepairTimeEstimator';
@@ -28,7 +28,7 @@ import DynamicCompletionCard from './DynamicCompletionCard';
 import RepairDeviceLabelQR from './RepairDeviceLabelQR';
 import RepairDocumentation from './RepairDocumentation';
 import ClientProfileRepairOrders from './ClientProfileRepairOrders';
-import { Microscope, User } from 'lucide-react';
+import { Microscope } from 'lucide-react';
 
 interface TelemetrySummary {
   batteryHealthPercentage: number;
@@ -771,12 +771,14 @@ export default function RepairStatusTracker() {
       )}
 
       {/* Camera QR Code Scanner Modal */}
-      <QRScannerModal
+      <BarcodeScannerModal
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
-        onScanSuccess={(scannedText) => {
-          showToast(`Repair Ticket Identified: ${scannedText}`, 'success');
-          fetchTicketStatus(scannedText);
+        targetField="ticket"
+        onScanSuccess={(scannedData) => {
+          const ticketNumber = scannedData.ticketId ?? scannedData.rawValue;
+          showToast(`Repair Ticket Identified: ${ticketNumber}`, 'success');
+          fetchTicketStatus(ticketNumber);
         }}
       />
 

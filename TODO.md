@@ -1,6 +1,6 @@
 # Deployment Preparation: Final Manual Steps
 
-The project build is currently stabilized after major dependency upgrades and configuration fixes. The following manual steps are required to resolve the remaining 3 TypeScript errors before successful deployment.
+The project build is stabilized after major dependency upgrades and configuration fixes.
 
 ## 1. Fix Component Imports [DONE]
 The components were failing to import constants because they were attempting to import from `src/lib/constants` (a file that does not exist or has no exports) instead of `src/lib/constants.tsx` or `src/lib/ui-constants`.
@@ -19,10 +19,10 @@ The build failed with `Type error: Module '"@prisma/client"' has no exported mem
 - **Action Taken:** Added `prisma generate` to the `build` script in `package.json`.
 
 ## 4. Final Deployment
-Once the above steps are completed:
-1. Run `npx tsc --noEmit` to verify 0 errors.
-2. Run `npm run build` to verify production build success.
-3. Deploy to Vercel:
-   ```bash
-   npx vercel --prod
-   ```
+1. [DONE] `npx tsc --noEmit` completes with 0 errors.
+2. [DONE] `npm run build` completes successfully.
+3. [DONE] Deployed to Vercel production: `https://www.displaycellpros.com`.
+
+## 5. Dependency Security Follow-up
+1. [PENDING] Prisma 7.9.1 remains subject to three high-severity audit advisories through `@prisma/config` and `deepmerge-ts`.
+2. Do not apply npm's suggested downgrade to Prisma 6.12. Reassess when Prisma publishes a compatible security release.

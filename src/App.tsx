@@ -47,8 +47,8 @@ import { ToastProvider } from './components/Toast';
 import LabBenchParticles from './components/LabBenchParticles';
 import VoiceIntakeModal, { VoiceIntakeTicket } from './components/VoiceIntakeModal';
 import { useFounderAnimationSpeed } from './hooks/useFounderAnimationSpeed';
-import ryanYoungImageImport from './assets/images/regenerated_image_1786855284519.jpg';
-const ryanYoungImage = typeof ryanYoungImageImport === 'string' ? ryanYoungImageImport : ryanYoungImageImport.src;
+import ryanYoungImageImport from './assets/images/regenerated_image_1786855135392.jpg';
+const ryanYoungImage = ryanYoungImageImport;
 
 // Code-split dynamic views with React.lazy for optimized bundle performance
 const IntakeForm = lazy(() => import('./components/IntakeForm'));
