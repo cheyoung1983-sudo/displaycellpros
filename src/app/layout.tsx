@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import UserProviderWrapper from '@/components/UserProviderWrapper';
 
@@ -46,6 +47,7 @@ export default function RootLayout({
             </div>
           </footer>
         </UserProviderWrapper>
+        <Analytics />
       </body>
     </html>
   );
