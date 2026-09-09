@@ -34,7 +34,18 @@ export async function proxy(request: Request) {
   // Auth0 v4 mounts /auth/login, /auth/logout, /auth/callback, /auth/profile,
   // and /auth/access-token entirely through this middleware call -- there's
   // no per-route handler like the old v3 handleAuth() catch-all.
-  const authResponse = await auth0.middleware(request);
+  let authResponse: NextResponse;
+  try {
+    authResponse = await auth0.middleware(request);
+  } catch (err) {
+    console.error('[Auth0 Middleware Error]:', err);
+    if (url.pathname.startsWith('/auth/')) {
+      return applySecurityHeaders(NextResponse.json({ error: 'Authentication service unavailable' }, { status: 500 }));
+    }
+    // Auth0 is unavailable/misconfigured -- let non-auth routes continue
+    // without a refreshed session rather than taking the whole site down.
+    authResponse = NextResponse.next();
+  }
   if (url.pathname.startsWith('/auth/')) {
     return applySecurityHeaders(authResponse);
   }
