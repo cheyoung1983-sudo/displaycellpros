@@ -35,7 +35,7 @@ import {
   Filter,
   Copy
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export type DiagnosticStepStatus = 'pass' | 'fault' | 'remediated' | 'in_progress';
 

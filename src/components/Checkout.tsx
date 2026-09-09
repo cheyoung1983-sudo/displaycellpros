@@ -17,7 +17,7 @@ interface CheckoutProps {
 let stripePromise: Promise<StripeJS | null> | null = null;
 
 function getStripePromise() {
-  const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
+  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
   if (!stripePromise && publishableKey) {
     stripePromise = loadStripe(publishableKey);
   }
@@ -35,7 +35,7 @@ export default function Checkout({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY;
     setPublishableKeyPresent(Boolean(key));
   }, []);
 

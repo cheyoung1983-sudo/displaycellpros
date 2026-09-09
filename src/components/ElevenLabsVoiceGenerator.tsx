@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Volume2, Play, Square, Loader2, Sparkles, Mic, FileText, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 interface ElevenLabsVoiceGeneratorProps {
   initialText?: string;

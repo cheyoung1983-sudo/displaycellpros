@@ -42,24 +42,24 @@ import {
   IntakeFormSchema, 
   Manufacturer, 
   ServiceTier 
-} from '../types.ts';
-import { cn } from '../lib/utils.ts';
-import { calculateQuote, PricingBreakdown } from '../lib/pricing.ts';
-import { downloadDatabaseBackup, saveOfflineRepairIntake } from '../lib/offline-db';
-import AIDiagnostic from './AIDiagnostic.tsx';
-import DeviceCameraCapture, { CapturedPhoto } from './DeviceCameraCapture.tsx';
-import TechnicianChecklist from './TechnicianChecklist.tsx';
-import SmartTriageChat from './SmartTriageChat.tsx';
-import { useToast } from './Toast.tsx';
-import SymptomChecklist, { DIAGNOSTIC_SYMPTOMS, SymptomItem } from './SymptomChecklist.tsx';
-import DevicePhotoCaptureInput from './DevicePhotoCaptureInput.tsx';
-import CommonRepairChecklist from './CommonRepairChecklist.tsx';
-import RecommendedDiagnosticPath from './RecommendedDiagnosticPath.tsx';
-import DeviceModelAutocomplete from './DeviceModelAutocomplete.tsx';
-import BarcodeScannerModal, { ScannedHardwareData } from './BarcodeScannerModal.tsx';
-import HardwareDiagnosticTool from './HardwareDiagnosticTool.tsx';
-import DiagnosticChecklist, { FailurePointItem, COMMON_HARDWARE_FAILURE_POINTS } from './DiagnosticChecklist.tsx';
-import { broadcastTechnicianIntakeAlert } from '../lib/technicianEvents.ts';
+} from '../types';
+import { cn } from '../lib/utils';
+import { calculateQuote, PricingBreakdown } from '../lib/pricing';
+import { downloadDatabaseBackup, saveOfflineRepairIntake } from '../lib/db';
+import AIDiagnostic from './AIDiagnostic';
+import DeviceCameraCapture, { CapturedPhoto } from './DeviceCameraCapture';
+import TechnicianChecklist from './TechnicianChecklist';
+import SmartTriageChat from './SmartTriageChat';
+import { useToast } from './Toast';
+import SymptomChecklist, { DIAGNOSTIC_SYMPTOMS, SymptomItem } from './SymptomChecklist';
+import DevicePhotoCaptureInput from './DevicePhotoCaptureInput';
+import CommonRepairChecklist from './CommonRepairChecklist';
+import RecommendedDiagnosticPath from './RecommendedDiagnosticPath';
+import DeviceModelAutocomplete from './DeviceModelAutocomplete';
+import BarcodeScannerModal, { ScannedHardwareData } from './BarcodeScannerModal';
+import HardwareDiagnosticTool from './HardwareDiagnosticTool';
+import DiagnosticChecklist, { FailurePointItem, COMMON_HARDWARE_FAILURE_POINTS } from './DiagnosticChecklist';
+import { broadcastTechnicianIntakeAlert } from '../lib/technicianEvents';
 
 const STEPS = [
   { id: 1, name: 'Reconnaissance', icon: Smartphone },
@@ -289,10 +289,9 @@ export default function IntakeForm() {
             setValue('deviceModel', ticket.deviceModel, { shouldValidate: true });
           }
           if (ticket.serviceTier) {
-            if (ticket.serviceTier === 'TIER_1_POWER_PORT_REFRESH') setValue('serviceTier', ServiceTier.TIER_1, { shouldValidate: true });
-            else if (ticket.serviceTier === 'TIER_2_DISPLAY_RENEWAL') setValue('serviceTier', ServiceTier.TIER_2, { shouldValidate: true });
-            else if (ticket.serviceTier === 'TIER_3_MICRO_SOLDERING') setValue('serviceTier', ServiceTier.TIER_3, { shouldValidate: true });
-            else if (ticket.serviceTier === 'TIER_4_CLEANROOM_DATA_RECOVERY') setValue('serviceTier', ServiceTier.TIER_4, { shouldValidate: true });
+            if (ticket.serviceTier === 'TIER_1_POWER_PORT_REFRESH') setValue('serviceTier', ServiceTier.TIER_1_POWER, { shouldValidate: true });
+            else if (ticket.serviceTier === 'TIER_2_DISPLAY_RENEWAL') setValue('serviceTier', ServiceTier.TIER_2_DISPLAY, { shouldValidate: true });
+            else if (ticket.serviceTier === 'TIER_3_MICRO_SOLDERING' || ticket.serviceTier === 'TIER_4_CLEANROOM_DATA_RECOVERY') setValue('serviceTier', ServiceTier.TIER_3_BOARD, { shouldValidate: true });
           }
           if (ticket.issueTranscript || ticket.triageSummary) {
             const issueText = `[ElevenLabs Voice Intake Ref: ${ticket.ticketNumber}]\nSpoken Issue: "${ticket.issueTranscript}"\nSuspected Fault: ${ticket.suspectedFault}\nTechnician Triage: ${ticket.triageSummary}`;

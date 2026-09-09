@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { WifiOff, HardDrive, Download } from 'lucide-react';
-import { downloadDatabaseBackup } from '../lib/offline-db';
+import { downloadDatabaseBackup } from '../lib/db';
 
 export default function OfflineStatusBanner() {
   const [isOnline, setIsOnline] = useState<boolean>(

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useToast } from './Toast.tsx';
-import LiveTechnicianChat from './LiveTechnicianChat.tsx';
+import { useToast } from './Toast';
+import LiveTechnicianChat from './LiveTechnicianChat';
 import { 
   Send, 
   User, 

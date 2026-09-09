@@ -25,7 +25,7 @@ import {
   HardDrive,
   FileSpreadsheet
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export interface DatabaseInventoryItem {
   id: string;

@@ -12,8 +12,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CapturedPhoto } from '../types.ts';
-import { useToast } from './Toast.tsx';
+import { CapturedPhoto } from '../types';
+import { useToast } from './Toast';
 
 interface DevicePhotoCaptureInputProps {
   photos: CapturedPhoto[];

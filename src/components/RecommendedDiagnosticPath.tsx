@@ -19,8 +19,8 @@ import {
   SlidersHorizontal,
   Bot
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
-import { TelemetryData } from '../types.ts';
+import { useToast } from './Toast';
+import { TelemetryData } from '../types';
 
 export interface DiagnosticStep {
   stepNumber: number;

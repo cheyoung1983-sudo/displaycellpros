@@ -17,7 +17,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 const agentJsonConfig = {
   "agent_id": "agent_5601ky3cxy0jepdaj25fv8p0y5fn",

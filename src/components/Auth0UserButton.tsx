@@ -17,12 +17,12 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useSafeAuth0 } from './Auth0ProviderWithConfig.tsx';
-import { useToast } from './Toast.tsx';
-import { evaluateUserRbac } from '../lib/auth0Rbac.ts';
-import Auth0RbacModal from './Auth0RbacModal.tsx';
-import Auth0TenantAuditReport from './Auth0TenantAuditReport.tsx';
-import GitHubOAuthModal from './GitHubOAuthModal.tsx';
+import { useSafeAuth0 } from './Auth0ProviderWithConfig';
+import { useToast } from './Toast';
+import { evaluateUserRbac } from '../lib/auth0Rbac';
+import Auth0RbacModal from './Auth0RbacModal';
+import Auth0TenantAuditReport from './Auth0TenantAuditReport';
+import GitHubOAuthModal from './GitHubOAuthModal';
 import { Github } from 'lucide-react';
 
 export default function Auth0UserButton() {

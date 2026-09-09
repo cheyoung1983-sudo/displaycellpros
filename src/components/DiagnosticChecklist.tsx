@@ -26,9 +26,9 @@ import {
   Wrench,
   HelpCircle
 } from 'lucide-react';
-import { ServiceTier } from '../types.ts';
-import { useToast } from './Toast.tsx';
-import { cn } from '../lib/utils.ts';
+import { ServiceTier } from '../types';
+import { useToast } from './Toast';
+import { cn } from '../lib/utils';
 
 export type FailureSeverity = 'critical' | 'major' | 'minor';
 

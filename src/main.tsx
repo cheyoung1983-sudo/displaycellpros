@@ -1,10 +1,10 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
-import App from './App.tsx';
+import App from './App';
 import './index.css';
-import { registerServiceWorker } from './registerServiceWorker.ts';
-import { ErrorBoundary } from './components/ErrorBoundary.tsx';
-import { Auth0ProviderWithConfig } from './components/Auth0ProviderWithConfig.tsx';
+import { registerServiceWorker } from './registerServiceWorker';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Auth0ProviderWithConfig } from './components/Auth0ProviderWithConfig';
 
 // Prevent uncaught browser extension or message channel disconnects from crashing runtime
 if (typeof window !== 'undefined') {

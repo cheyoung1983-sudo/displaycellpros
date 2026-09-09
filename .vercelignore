@@ -45,7 +45,7 @@ www.displaycellpros.com-refractored
 
 # Legacy Root Files
 server.ts
-api/
+/api/
 app.yaml
 deploy.sh
 Dockerfile

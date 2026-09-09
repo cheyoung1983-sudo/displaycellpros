@@ -11,8 +11,8 @@ import {
   Maximize2,
   Sparkles
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
-import { CapturedPhoto } from '../types.ts';
+import { useToast } from './Toast';
+import { CapturedPhoto } from '../types';
 
 export type { CapturedPhoto };
 

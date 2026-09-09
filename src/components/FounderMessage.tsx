@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Quote, Sparkles, ShieldCheck, Terminal, Award, CheckCircle2, ArrowRight } from 'lucide-react';
-import ryanYoungImage from '../assets/images/regenerated_image_1786855284519.jpg';
+import ryanYoungImageImport from '../assets/images/regenerated_image_1786855135392.jpg';
+const ryanYoungImage = ryanYoungImageImport;
 
 interface FounderMessageProps {
   onLearnMoreProtocol?: () => void;

@@ -17,8 +17,8 @@ import {
   ChevronRight,
   Info
 } from 'lucide-react';
-import { calculateDynamicCompletionDate, LabWorkloadParameters } from '../utils/completionCalculator.ts';
-import { useToast } from './Toast.tsx';
+import { calculateDynamicCompletionDate, LabWorkloadParameters } from '../utils/completionCalculator';
+import { useToast } from './Toast';
 
 interface DynamicCompletionCardProps {
   ticketNumber?: string;

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import ryanYoungImage from '../assets/images/regenerated_image_1786855284519.jpg';
-import FounderMessage from './FounderMessage.tsx';
+import ryanYoungImageImport from '../assets/images/regenerated_image_1786855135392.jpg';
+const ryanYoungImage = ryanYoungImageImport;
+import FounderMessage from './FounderMessage';
 import { 
   MapPin, 
   Mail, 

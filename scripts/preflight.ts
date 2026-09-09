@@ -4,15 +4,13 @@
  * Catches the two failure classes that have actually broken this repo's CI:
  * 1. An npm script (test/lint/build/etc.) references a binary that isn't
  *    actually installed as a dependency — `npm install` succeeds, the script
- *    just fails at runtime. (This happened with `tsx`, `eslint`, and the
- *    `@testing-library/*` packages jest.setup.ts needed.)
+ *    just fails at runtime. (This happened with `tsx` and `eslint`.)
  * 2. The local branch has drifted from `origin/main` — someone pushed
  *    directly to main (or another PR merged) while this branch was in
  *    progress, so a clean build here doesn't guarantee a clean merge.
  *
- * Then it runs the same lint -> typecheck -> test -> test:jest -> build
- * pipeline CI runs, in the same order, so a failure surfaces here instead of
- * in a CI log.
+ * Then it runs the same lint -> typecheck -> test -> build pipeline CI runs,
+ * in the same order, so a failure surfaces here instead of in a CI log.
  *
  * Usage: npm run preflight
  */
@@ -138,7 +136,6 @@ const pipeline: Array<[string, string]> = [
   ["Typecheck", "npx tsc --noEmit"],
   ["Lint", "npm run lint"],
   ["Unit tests", "npm run test"],
-  ["Jest suite", "npm run test:jest"],
   ["Build", "npm run build"],
 ];
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 import {
   TelemetrySchema,
   DiagnoseSchema,
@@ -6,7 +6,7 @@ import {
   CalculateCompletionSchema,
   BookingScheduleSchema,
   SupportMessageSchema,
-} from './schemas.ts';
+} from './schemas';
 
 describe('Zod Validation Schemas', () => {
   it('validates TelemetrySchema with default values', () => {

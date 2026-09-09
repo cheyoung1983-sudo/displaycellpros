@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, AlertCircle, Info, X, Bell, Wrench, ArrowRight } from 'lucide-react';
-import { subscribeToTechnicianAlerts, NewIntakePayload } from '../lib/technicianEvents.ts';
+import { subscribeToTechnicianAlerts, NewIntakePayload } from '../lib/technicianEvents';
 
 export type ToastType = 'success' | 'error' | 'info' | 'technician';
 

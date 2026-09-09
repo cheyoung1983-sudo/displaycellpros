@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingBag, ChevronRight, Star, Search, Filter } from 'lucide-react';
-import { cn } from '../lib/utils.ts';
+import { cn } from '../lib/utils';
 
 const PRODUCTS = [
   {

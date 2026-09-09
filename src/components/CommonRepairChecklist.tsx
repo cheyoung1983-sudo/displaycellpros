@@ -15,7 +15,7 @@ import {
   ChevronRight,
   ClipboardList
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export type VerificationStatus = 'unchecked' | 'pass' | 'fail';
 

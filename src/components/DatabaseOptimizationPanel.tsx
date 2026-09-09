@@ -5,9 +5,9 @@ import {
   TrendingUp, RefreshCw, Cpu, Check, HardDrive, Download, FileJson,
   FileSpreadsheet, FolderDown, ShieldCheck, AlertCircle
 } from 'lucide-react';
-import { useToast } from './Toast.tsx';
-import { REPAIR_DB_INDEX_RECOMMENDATIONS, POSTGRES_TABLE_SCHEMAS_DDL } from '../lib/dbOptimizations.ts';
-import { useDatabase, downloadDatabaseBackup } from '../lib/offline-db';
+import { useToast } from './Toast';
+import { REPAIR_DB_INDEX_RECOMMENDATIONS, POSTGRES_TABLE_SCHEMAS_DDL } from '../lib/dbOptimizations';
+import { useDatabase, downloadDatabaseBackup } from '../lib/db';
 
 interface PoolMetricsData {
   status: string;

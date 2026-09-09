@@ -20,7 +20,7 @@ import {
   Layers 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export interface VoiceIntakeTicket {
   ticketNumber: string;

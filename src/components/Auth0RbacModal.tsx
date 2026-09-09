@@ -22,9 +22,9 @@ import {
   DEFAULT_AUTH0_RBAC_DATA, 
   Auth0AuthorizationExtensionData, 
   evaluateUserRbac 
-} from '../lib/auth0Rbac.ts';
-import { useToast } from './Toast.tsx';
-import { useSafeAuth0 } from './Auth0ProviderWithConfig.tsx';
+} from '../lib/auth0Rbac';
+import { useToast } from './Toast';
+import { useSafeAuth0 } from './Auth0ProviderWithConfig';
 
 interface Auth0RbacModalProps {
   isOpen: boolean;

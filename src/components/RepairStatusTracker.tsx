@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 import { 
   Search, 
   CheckCircle2, 
@@ -20,15 +20,15 @@ import {
   Camera,
   Radio
 } from 'lucide-react';
-import QRScannerModal from './QRScannerModal.tsx';
-import NFCScannerModal from './NFCScannerModal.tsx';
-import WarrantyTrackerCard from './WarrantyTrackerCard.tsx';
-import RepairTimeEstimator from './RepairTimeEstimator.tsx';
-import DynamicCompletionCard from './DynamicCompletionCard.tsx';
-import RepairDeviceLabelQR from './RepairDeviceLabelQR.tsx';
-import RepairDocumentation from './RepairDocumentation.tsx';
-import ClientProfileRepairOrders from './ClientProfileRepairOrders.tsx';
-import { Microscope, User } from 'lucide-react';
+import BarcodeScannerModal from './BarcodeScannerModal';
+import NFCScannerModal from './NFCScannerModal';
+import WarrantyTrackerCard from './WarrantyTrackerCard';
+import RepairTimeEstimator from './RepairTimeEstimator';
+import DynamicCompletionCard from './DynamicCompletionCard';
+import RepairDeviceLabelQR from './RepairDeviceLabelQR';
+import RepairDocumentation from './RepairDocumentation';
+import ClientProfileRepairOrders from './ClientProfileRepairOrders';
+import { Microscope } from 'lucide-react';
 
 interface TelemetrySummary {
   batteryHealthPercentage: number;
@@ -771,12 +771,14 @@ export default function RepairStatusTracker() {
       )}
 
       {/* Camera QR Code Scanner Modal */}
-      <QRScannerModal
+      <BarcodeScannerModal
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
-        onScanSuccess={(scannedText) => {
-          showToast(`Repair Ticket Identified: ${scannedText}`, 'success');
-          fetchTicketStatus(scannedText);
+        targetField="ticket"
+        onScanSuccess={(scannedData) => {
+          const ticketNumber = scannedData.ticketId ?? scannedData.rawValue;
+          showToast(`Repair Ticket Identified: ${ticketNumber}`, 'success');
+          fetchTicketStatus(ticketNumber);
         }}
       />
 

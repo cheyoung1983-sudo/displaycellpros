@@ -14,7 +14,7 @@ import {
   Settings 
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useToast } from './Toast.tsx';
+import { useToast } from './Toast';
 
 export default function ElevenLabsConversationFlow() {
   const { showToast } = useToast();
