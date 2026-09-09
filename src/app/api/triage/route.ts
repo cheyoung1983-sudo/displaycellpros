@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server';
-import { OpenAI } from 'openai';
+import { generateObject } from 'ai';
+import { TriageResponseSchema } from '@/lib/schemas';
 
 export const dynamic = 'force-dynamic';
 
-function getOpenAIClient() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing OPENAI_API_KEY environment variable.");
-  }
-  return new OpenAI({ apiKey });
-}
+const TRIAGE_MODEL = 'alibaba/qwen-3-32b';
 
 const systemInstruction = `
 You are the Display & Cell Pros Intelligent AI Hardware Diagnostics assistant, an expert laboratory-grade driveway device troubleshooting engineer stationed in Spokane & Seattle WA. Your objective is to guide customers down the following three-step logic flow:
@@ -45,8 +40,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "An array of messages is required." }, { status: 400 });
     }
 
-    const openaiClient = getOpenAIClient();
-
     const deviceContextPrompt = deviceDetails
       ? `User current UI state: ${deviceDetails.brand || "Unspecified"} brand, ${deviceDetails.model || "Unspecified"} model (${deviceDetails.tier || "standard"} tier). Merge appropriately based on user input.`
       : `User has not selected a specific device yet inside the UI. Maintain full flow from greeting onwards.`;
@@ -56,24 +49,19 @@ export async function POST(req: Request) {
       content: msg.text
     }));
 
-    const response = await openaiClient.chat.completions.create({
-      model: "gpt-4o",
+    const { object } = await generateObject({
+      model: TRIAGE_MODEL,
+      schema: TriageResponseSchema,
+      system: systemInstruction,
       messages: [
-        { role: "system", content: systemInstruction },
         { role: "user", content: `CONTEXT:\n${deviceContextPrompt}` },
         ...contents
       ],
-      response_format: { type: "json_object" }
     });
-
-    const replyText = response.choices[0]?.message?.content || "{}";
 
     // Apply outbound Lexical Firewall to scrub AI hallucinations or forbidden terms
     const { sanitizeAIResponse } = await import('@/lib/lexical-firewall');
-    const sanitizedReply = JSON.parse(replyText);
-    if (sanitizedReply.text) {
-      sanitizedReply.text = sanitizeAIResponse(sanitizedReply.text);
-    }
+    const sanitizedReply = { ...object, text: sanitizeAIResponse(object.text) };
 
     return NextResponse.json(sanitizedReply);
 

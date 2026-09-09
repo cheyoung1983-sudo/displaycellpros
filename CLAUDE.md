@@ -1,0 +1,98 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+Display & Cell Pros LLC — a Next.js 16 (App Router, Turbopack) marketing + repair-shop web app for a Spokane, WA mobile device repair business. It combines a Shopify storefront, an AI-assisted repair intake/diagnostics flow (Vercel AI Gateway + Qwen3), Auth0 + NextAuth authentication, and a direct AWS Aurora PostgreSQL connection (via Prisma and a hand-rolled `pg` pool with IAM signing).
+
+## Commands
+
+```bash
+npm run dev          # next dev -p 3000 -H 0.0.0.0
+npm run build         # prisma generate && next build
+npm start             # next start -p 3000 (serve production build)
+npm run lint           # eslint . (flat config, eslint.config.mjs)
+npx tsc --noEmit        # strict typecheck (CI runs this separately from lint)
+npm run test           # tsx scripts/run-all-tests.ts && vitest run --config vitest.config.ts
+npm run test:shopify    # tsx scripts/test-shopify.ts — hits real/sandboxed Shopify API
+npm run test:all        # test + test:shopify
+npm run preflight        # scripts/preflight.ts — run before pushing/opening a PR (see below)
+```
+
+### Before pushing: `npm run preflight`
+
+Run this before pushing or opening a PR. It exists because CI has broken repeatedly for reasons a normal `npm run build` locally wouldn't catch: an npm script referencing a binary (`tsx`, `eslint`) that was never actually added to `package.json`, and a branch going stale against `main` after someone else pushed directly to it. `scripts/preflight.ts` checks, in order: every npm script's binary actually resolves in `node_modules/.bin`, the lockfile is in sync (`npm ci --dry-run`), `npm outdated`/`npm audit` (informational only — see the known, intentionally-unpatched advisories below), whether the current branch is behind `origin/main`, then the same `tsc --noEmit` → `lint` → `test` → `build` pipeline CI runs. Exits non-zero if any of the hard checks fail.
+
+There is no dev server for the legacy Vite/Express app (`server.ts`) wired into `package.json` — see "Legacy Vite/Express app" below if you need to touch it.
+
+### Testing — read before adding tests
+
+`npm run test` runs two things in sequence, both wired into CI (`.github/workflows/webpack.yml`, in this order: lint → `test` → build):
+- `tsx scripts/run-all-tests.ts` — a small hand-written assertion script (not a test framework) that only imports and exercises `completionCalculator.ts` and `supportedDevicesData.ts`.
+- `vitest run --config vitest.config.ts` — runs the `*.test.ts` files scattered under `src/` (e.g. `src/lib/pricing.test.ts`, `src/lib/schemas.test.ts`, `src/components/*.test.ts`), Node environment. Import `describe`/`it`/`expect`/`vi` from `'vitest'`. (An earlier iteration of this repo tried porting these files to Jest — `jest.config.ts`, `@jest/globals` imports — before a separate PR properly installed Vitest, which is what these files were actually written against from the start. Jest's config and the `@testing-library/*`/`jest-environment-jsdom` packages have been removed; don't reintroduce them.)
+
+`tsx` and `eslint`/`eslint-config-next` are real, installed devDependencies now — both were previously referenced by `package.json` scripts (`test`, `lint`) without being installed, so `npm install` alone didn't make those scripts work. If a fresh `npm ci` ever reports one of these commands as "not found" again, the fix is to add the missing package, not to assume the script is aspirational. `eslint` is on 9.x using flat config (`eslint.config.mjs`, wraps `eslint-config-next/core-web-vitals`) — there is no `.eslintrc.json` anymore.
+
+If you add logic that needs testing, either add assertions to `scripts/run-all-tests.ts` following its existing `assert(condition, name, detail)` pattern, or add a Vitest test file following the existing ones' style.
+
+## Architecture
+
+### Two apps live in this repo — only one is deployed
+
+- **`src/app/**`** (Next.js App Router) is the real, deployed application. `vercel.json` declares `"framework": "nextjs"`, and `npm run build`/`dev`/`start` all invoke Next.js directly against this tree.
+- **`index.html`, `src/main.tsx`, `src/App.tsx`, `server.ts`, `api/index.ts`, `vite.config.ts`, `index.ts`** are a legacy Vite + Express SPA (from an earlier "AI Studio" scaffold). `.vercelignore` explicitly excludes `server.ts` and `api/` from the Vercel build. These files are **not part of the production build** — don't assume changes here have any effect on the live site unless you're deliberately reviving this path. When in doubt about which app a change belongs in, check whether the target file is under `src/app/`.
+- The legacy SPA's component tree (everything only reachable by import from `src/App.tsx`, e.g. `Checkout.tsx`, `StripeCheckoutModal.tsx`, `Auth0ProviderWithConfig.tsx`, `IntakeForm.tsx`, `RepairStatusTracker.tsx`, `AboutUs.tsx`, `FounderMessage.tsx`, `LiveTechnicianChat.tsx`, and a few more) is explicitly listed in `tsconfig.json`'s `exclude`, same precedent as `server.ts`/`api/`. Those files use Vite-only `import.meta.env`, which still doesn't work under Next's tsconfig regardless of what's installed. `stripe`/`@stripe/stripe-js`/`@stripe/react-stripe-js`/`express`/`@vercel/node` **are now real dependencies** (added for eventual production use), but that doesn't make the legacy `Checkout.tsx`/`StripeCheckoutModal.tsx` live — they're still only reachable from `src/App.tsx`. Verify reachability from `src/app/**` first if you're unsure whether a `src/components/*` file is live or legacy (grep its name under `src/app/`, then check what imports *its* importer, since the legacy tree is several components deep in places).
+
+### Routing & pages (`src/app`)
+
+Standard Next.js App Router: each `src/app/<segment>/page.tsx` is a route (`store`, `cart`, `b2b`, `services`, `products/[handle]`, `privacy`, `welcome`, `lab`, `comments`). API routes live under `src/app/api/**/route.ts` — notable ones:
+- `api/auth/**` — NextAuth (`[...nextauth]`) plus custom Auth0 callback/refresh/signin/start routes (both auth systems are present; see Auth below).
+- `api/mcp/{authorize,token}` — MCP OAuth endpoints (used by Vercel Connect / MCP tooling, not end-user auth).
+- `api/chat`, `api/triage`, `api/generate-quote`, `api/tax-lookup`, `api/tickets` — AI-assisted repair intake/diagnostics and quoting endpoints, validated with the Zod schemas in `src/lib/schemas.ts` (`DiagnoseSchema`, `SmartTriageSchema`, `DiagnosticPathSchema`, `CalculateCompletionSchema`, `BookingScheduleSchema`, etc.).
+- `api/cron/refresh` — scheduled via the `crons` entry in `vercel.json` (daily).
+- `api/health` — uptime-monitor target (`README_PROD.md`).
+
+`src/middleware.ts` wraps `src/proxy.ts` and injects a production-only Content-Security-Policy; `vercel.json` also sets its own security headers for the same routes — if you change CSP/security headers, update both places.
+
+### Auth — two systems coexist
+
+- **Auth0** (`@auth0/nextjs-auth0`, `@auth0/auth0-react`) is the primary end-user login (`src/lib/auth0.ts`, `Auth0ProviderWithConfig`, `src/app/auth/[auth0]/route.ts`, `src/app/auth/profile/route.ts`, `src/app/auth/signin/page.tsx`). `src/lib/auth0-mgmt.ts` wraps the Auth0 Management API (RBAC, tenant audit — see `Auth0RbacModal`, `Auth0TenantAuditReport`).
+- **NextAuth** (`next-auth`, `@next-auth/prisma-adapter`) also exists (`api/auth/[...nextauth]`) backed by the Prisma `Account`/`Session`/`User`/`VerificationToken` models in `prisma/schema.prisma`. Confirm which system a given surface actually uses before extending auth — don't assume they're unified.
+
+### Data layer — two databases, two access patterns
+
+- **Prisma** (`src/lib/prisma.ts`, `prisma/schema.prisma`) — only models NextAuth's own tables today (Account/Session/User/VerificationToken). Datasource URL comes from `DATABASE_URL` (see `prisma.config.ts`, which supplies it to `PrismaClient` automatically) — it is a **separate Postgres database from the Aurora repair-shop cluster below**; `prisma.ts` is a plain `new PrismaClient()` with no manual pool/adapter, don't wire it to `serverDb.ts`'s pool. `prisma generate` runs as part of `npm run build` and `postinstall`.
+- **Direct AWS Aurora PostgreSQL** — `src/lib/serverDb.ts` (the actual `pg` connection pool: `query`/`queryReadOnly`/`isDbConfigured`/`getDatabasePool`) and `src/lib/dbOptimizations.ts` (index/schema recommendations). Read/write split (`PGHOST` vs `PGHOST_READ_ONLY`) with RDS IAM signing (`@aws-sdk/rds-signer`) instead of a static password; pool sizing/timeouts are tunable via `PG_MAX_POOL`, `PG_RO_MAX_POOL`, `PG_IDLE_TIMEOUT_MS`, `PG_CONNECTION_TIMEOUT_MS`, `PG_STATEMENT_TIMEOUT_MS`, `PG_MAX_USES` (see `.env.example`). This is the repair-shop domain data path (intake, diagnostics, tickets) — Prisma is not used for it.
+- **`src/lib/db.ts` is not the Postgres layer** despite the similar name — it's a `'use client'` module: an offline-first SQLite fallback (`initSqliteDatabase`) and the `useDatabase`/`useOfflineDatabase` React hooks for persisting repair intake entries client-side when offline. Importing it from a Server Component breaks the build (`"needs useState"` RSC error) since it pulls in React hooks — this already happened once (`comments/page.tsx` and `api/tickets/route.ts` both imported `query`/`isDbConfigured` from here, which don't exist in this file at all; they live in `serverDb.ts`). If a server-side file needs a DB query, import from `serverDb.ts`, never `db.ts`.
+
+### Commerce (Shopify)
+
+`src/lib/shopify.ts` is the Storefront API GraphQL client (`shopifyFetch`), defaulting to a sandbox store/token baked in as fallbacks if env vars are unset — real deployments must set `SHOPIFY_STORE_DOMAIN`/`SHOPIFY_STOREFRONT_ACCESS_TOKEN`. Query/mutation documents live in `src/lib/shopify/operations/` (e.g. `products.ts`); `src/lib/shopify-queries.ts` and `src/lib/shopify-types.ts` hold additional queries and generated-style types. Cart logic is in `src/lib/cart-actions.ts` and `src/app/cart/`.
+
+### Repair/diagnostics domain logic
+
+This is the app's differentiator — most of it lives in `src/lib/` and `src/utils/`, independent of any specific route:
+- `src/utils/completionCalculator.ts` — dynamic ETA calculation (queue position, technician load, parts availability, priority tier) — has the most test coverage (`scripts/run-all-tests.ts` + `completionCalculator.test.ts`).
+- `src/data/supportedDevicesData.ts` — the supported-device catalog (model names, board IDs, model numbers) used for fuzzy device lookup.
+- `src/lib/repair-logic.ts` (`calculateQuoteInternal`, `WA_TAX_DATA`) is the **live** quote/tax engine — called by `api/generate-quote/route.ts` and `src/app/lab/page.tsx`. `src/lib/pricing.ts` (`calculateQuote`, Spokane-only `TAX_RATES`) is a second, differently-shaped pricing model (single `ServiceTier`-keyed quote vs. `repair-logic.ts`'s budget/professional/authorized 3-tier comparison) but its only callers are `IntakeForm.tsx` and `RepairEstimateCalculator.tsx` — both part of the excluded legacy SPA tree above. They are not interchangeable and not in sync (different labor rates, tax tables, tier models) — that's fine only because `pricing.ts` never actually runs in production; don't assume changing one updates the other.
+- `src/lib/schemas.ts` — the Zod validation contracts for the AI/diagnostic API routes.
+- AI integration is exactly two routes, both via the Vercel AI SDK (`ai` package) routed through **Vercel AI Gateway** to Alibaba Cloud Qwen3 models (`AI_GATEWAY_API_KEY` locally, `VERCEL_OIDC_TOKEN` automatically in production): `api/chat` (`generateText`, `alibaba/qwen3-next-80b-a3b-instruct`) and `api/triage` (`generateObject` + `TriageResponseSchema` from `schemas.ts`, `alibaba/qwen-3-32b`). `@google/genai` (Gemini) and the raw `openai` package are **not** used by any deployed route — `@google/genai` only appears in the excluded legacy `server.ts`, and `openai` is now only a dependency of that same legacy app. Don't assume `SmartTriageChat.tsx`, `HardwareDiagnosticTool.tsx`, or `VoiceIntakeModal.tsx` are live examples of this integration: none of them are reachable from `src/app/**`, and two of the three (`SmartTriageChat.tsx`, `VoiceIntakeModal.tsx`) fetch API routes (`/api/ai/smart-triage`, `/api/elevenlabs/*`) that don't exist in this repo at all.
+
+### Components
+
+`src/components/` is a large flat directory (100+ files, no subfolders) covering repair intake/diagnostics UI, the Auth0/ElevenLabs/voice-agent admin tooling, store/cart UI, and shared chrome (`Navbar`, `Footer`, `LayoutWrapper`). There's no naming/grouping convention beyond PascalCase filenames matching the exported component — grep for the component name rather than guessing a subfolder.
+
+Path alias: `@/*` maps to `./src/*` (`tsconfig.json`). Styling is Tailwind v4 (`@tailwindcss/postcss`, `tailwind.config.js`, `globals.css`); `src/lib/utils.ts` exports `cn()` (clsx + tailwind-merge) as the standard classname helper.
+
+## Deployment & environments
+
+- Production target is **Vercel** (`vercel.json`: framework, security headers, daily cron). `README_PROD.md` documents rollback (`vercel rollback`), preview-vs-production promotion (push to non-`main` = preview, `main` = production), health-check monitoring (`/api/health`), log drains, and the `express-rate-limit` threshold (100 req/15 min) — that rate limiter is in `server.ts`, which per above is **not part of the deployed app**; if rate limiting needs adjusting for the real app, it isn't currently implemented in `src/app/**` and will need to be added there (e.g. in `middleware.ts`).
+- `netlify.toml` also exists (redirects `/api/*` to Netlify functions, SPA fallback to `index.html`) — this targets the legacy Vite SPA, not the Next.js app; Vercel is the live deployment target per `README_PROD.md`.
+- CI (`.github/workflows/deploy.yml`, `webpack.yml`) runs on push/PR to `main`: `npm ci` → `npx tsc --noEmit` → `npm run lint` → `npm run test` → `npm run build`, on Node 20/22.
+- `npm install` uses `legacy-peer-deps=true` (`.npmrc`) — keep this in mind if dependency resolution behaves unexpectedly.
+- `npm audit` currently reports ~6 advisories (moderate/high), all requiring a breaking bump `npm audit fix --force` would apply reflexively: `prisma`'s dependency chain (`@prisma/config` → `deepmerge-ts`/`mysql2`) — the suggested "fix" is actually a *downgrade* of `prisma` to a pre-7 version, which would break `prisma.config.ts`'s Prisma-7 `defineConfig` API — and `vitest` → 5.0.0 (a dev-only test-runner major bump, low real-world risk but untested here). A prior **critical** Next.js RCE advisory (`next` 16.0.0–16.3.2, GHSA-p293-qw3h-jr36 / GHSA-2xp9-vwfh-vxw4) was fixed with a plain patch bump to `^16.3.4` — always check whether a new audit finding is actually a small patch bump like that one before assuming it needs the same "don't force it" treatment as the Prisma/Next-major situations.
+
+## Root-level scripts
+
+The repo root has a number of one-off `.cjs`/`.ts` scripts (`apply_autonoma_config*.cjs`, `pair_autonoma.cjs`, `trigger_autonoma_*.cjs`, `execute-mcp-tool.cjs`, `list-mcp-tools.cjs`, `get_app_logs.cjs`, `get_targets.cjs`, `request_autonoma_secrets.cjs`) — these are operational/MCP tooling utilities for the Autonoma platform and GitHub MCP server integration, unrelated to the Next.js app's runtime. `scripts/` (the directory) holds the actual dev/test/deploy helper scripts (`run-all-tests.ts`, `test-shopify.ts`, `test-db.ts`, `test-connection.ts`, `setup-db.ts`, `generate-sitemap.ts`, `deploy_vercel.ps1`).

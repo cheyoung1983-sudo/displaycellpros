@@ -68,6 +68,10 @@ function createPoolConfig(
   };
 }
 
+export function isDbConfigured(): boolean {
+  return Boolean(process.env.PGHOST || process.env.AWS_ROLE_ARN);
+}
+
 export function getDatabasePool(): Pool {
   if (!poolInstance) {
     const host = process.env.PGHOST || "dcp-production-db.cluster-cs7wcksg2js1.us-east-1.rds.amazonaws.com";
@@ -387,9 +391,5 @@ export async function runSupportedDevicesIndexMigration(): Promise<MigrationResu
       error: err?.message
     };
   }
-}
-
-export function isDbConfigured(): boolean {
-  return Boolean(process.env.DATABASE_URL || process.env.PGHOST);
 }
 
