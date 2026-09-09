@@ -349,7 +349,7 @@ Status: Physical hardware coupled over WebUSB link. Ready for triage calculation
   // Force login if not authenticated
   useEffect(() => {
     if (!isAuth0Loading && !auth0User) {
-      window.location.href = "/api/auth/login?returnTo=/lab";
+      window.location.href = "/auth/login?returnTo=/lab";
     }
   }, [auth0User, isAuth0Loading]);
 
@@ -393,7 +393,7 @@ Status: Physical hardware coupled over WebUSB link. Ready for triage calculation
         </div>
         <div className="flex items-center gap-2">
           <a
-            href="/api/auth/logout"
+            href="/auth/logout"
             className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold uppercase tracking-wider rounded-lg border border-slate-600 transition-colors flex items-center gap-2"
           >
             <LogOut className="w-3.5 h-3.5" />

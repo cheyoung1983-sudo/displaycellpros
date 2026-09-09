@@ -6,8 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const res = new NextResponse();
-    const session = await auth0.getSession(req, res);
+    const session = await auth0.getSession(req);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

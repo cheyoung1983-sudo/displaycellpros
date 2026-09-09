@@ -1,6 +1,14 @@
 import { get } from "@vercel/edge-config";
 import { NextResponse } from 'next/server';
 import { validateLexicalPayload } from '@/lib/lexical-firewall';
+import { auth0 } from '@/lib/auth0';
+
+function withAuthCookies(response: NextResponse, authResponse: NextResponse) {
+  authResponse.cookies.getAll().forEach((cookie) => {
+    response.cookies.set(cookie);
+  });
+  return response;
+}
 
 function applySecurityHeaders(response: NextResponse) {
   if (process.env.NODE_ENV === 'production') {
@@ -23,20 +31,28 @@ function applySecurityHeaders(response: NextResponse) {
 export async function proxy(request: Request) {
   const url = new URL(request.url);
 
+  // Auth0 v4 mounts /auth/login, /auth/logout, /auth/callback, /auth/profile,
+  // and /auth/access-token entirely through this middleware call -- there's
+  // no per-route handler like the old v3 handleAuth() catch-all.
+  const authResponse = await auth0.middleware(request);
+  if (url.pathname.startsWith('/auth/')) {
+    return applySecurityHeaders(authResponse);
+  }
+
   // Handle /api/welcome via Edge Config
   if (url.pathname === '/api/welcome') {
     try {
       const greeting = await get('greeting');
-      return applySecurityHeaders(NextResponse.json({
+      return withAuthCookies(applySecurityHeaders(NextResponse.json({
         greeting: greeting || "hello world",
         source: "vercel-edge-config-middleware"
-      }));
+      })), authResponse);
     } catch (err) {
-      return applySecurityHeaders(NextResponse.json({
+      return withAuthCookies(applySecurityHeaders(NextResponse.json({
         greeting: "hello world",
         source: "error-fallback",
         error: String(err)
-      }));
+      })), authResponse);
     }
   }
 
@@ -49,7 +65,7 @@ export async function proxy(request: Request) {
 
         if (!firewallCheck.isSafe) {
           console.warn(`[SECURITY ALERT] Payload blocked: ${firewallCheck.reason}`);
-          return applySecurityHeaders(NextResponse.json({ error: 'Invalid input syntax payload.' }, { status: 400 }));
+          return withAuthCookies(applySecurityHeaders(NextResponse.json({ error: 'Invalid input syntax payload.' }, { status: 400 })), authResponse);
         }
       } catch {
         // Not JSON or empty body
@@ -58,12 +74,10 @@ export async function proxy(request: Request) {
   }
 
   try {
-    // Auth0 middleware is handled via handleAuth() routes in Next.js 13+ App Router
-    // for standard authentication flows. 
-    return applySecurityHeaders(NextResponse.next());
+    return withAuthCookies(applySecurityHeaders(NextResponse.next()), authResponse);
   } catch (err) {
     console.warn('[AI Studio] Proxy processing error, bypassing:', err);
-    return applySecurityHeaders(NextResponse.next());
+    return withAuthCookies(applySecurityHeaders(NextResponse.next()), authResponse);
   }
 }
 
